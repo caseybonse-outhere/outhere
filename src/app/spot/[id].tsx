@@ -2,12 +2,13 @@ import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router
 import { useCallback, useMemo, useState } from 'react';
 import { Alert, Linking, Pressable, ScrollView, Text, View } from 'react-native';
 import { useAuth } from '../../lib/auth';
+import { Avatar } from '../../lib/avatar';
 import { addJamToCalendar } from '../../lib/calendar';
 import { block, fetchActiveSessions, fetchEvents, fetchReviews, report } from '../../lib/data';
 import { describeSchedule, formatTime, formatWhen, nextOccurrence, sunsetToday } from '../../lib/schedule';
 import { supabase } from '../../lib/supabase';
 import { colors, space, type } from '../../lib/theme';
-import type { JamEvent, Review, Session, Spot } from '../../lib/types';
+import { MUSIC_LABEL, type JamEvent, type Review, type Session, type Spot } from '../../lib/types';
 import { Button, Card, Chip, Empty, Field, Screen, Segmented } from '../../lib/ui';
 
 const FIRE_LABEL = { yes: 'Fire OK', no: 'No fire', permit: 'Fire with permit', unknown: 'Fire rules unknown' };
@@ -120,8 +121,15 @@ export default function SpotScreen() {
             <Empty text="Nobody’s checked in. Be the first." />
           ) : (
             sessions.map((x) => (
-              <Pressable key={x.id} onLongPress={() => x.user_id !== profile.id && moderate('session', x.id, x.user_id)} style={{ minHeight: 32, justifyContent: 'center' }}>
-                <Text style={type.body}>
+              <Pressable
+                key={x.id}
+                accessibilityRole="button"
+                onPress={() => router.push(`/profile/${x.user_id}`)}
+                onLongPress={() => x.user_id !== profile.id && moderate('session', x.id, x.user_id)}
+                style={{ minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: space.md }}
+              >
+                <Avatar url={x.profile?.avatar_url} name={x.profile?.display_name} size={36} />
+                <Text style={[type.body, { flex: 1 }]}>
                   <Text style={{ fontWeight: '700' }}>{x.profile?.display_name ?? 'Someone'}</Text>
                   {x.activity ? ` · ${x.activity}` : ''} · until {formatTime(new Date(x.ends_at))}
                 </Text>
@@ -161,7 +169,10 @@ export default function SpotScreen() {
             return (
               <View key={e.id} style={{ gap: 2, paddingVertical: space.xs }}>
                 <Text style={[type.body, { fontWeight: '700' }]}>{e.name}</Text>
-                <Text style={type.small}>{describeSchedule(e)}</Text>
+                <Text style={type.small}>
+                  {describeSchedule(e)}
+                  {e.music && e.music !== 'none' ? ` · ${MUSIC_LABEL[e.music]}` : ''}
+                </Text>
                 {occ && (
                   <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Text style={[type.small, { color: occ.happeningNow ? colors.grass : colors.coralDark, fontWeight: '700' }]}>{formatWhen(occ)}</Text>
@@ -202,10 +213,18 @@ export default function SpotScreen() {
           <Field label="Your take" value={reviewText} onChangeText={setReviewText} multiline placeholder="Anchors, crowds, cops, vibes…" />
           <Button title="Save review" onPress={saveReview} />
           {reviews.map((r) => (
-            <Pressable key={r.id} onLongPress={() => r.user_id !== profile.id && moderate('review', r.id, r.user_id)} style={{ paddingTop: space.sm, gap: 2 }}>
-              <Text style={[type.body, { fontWeight: '700' }]}>
-                {r.rating > 0 ? `+${r.rating}` : r.rating} · {r.profile?.display_name ?? 'Member'}
-              </Text>
+            <Pressable
+              key={r.id}
+              onPress={() => router.push(`/profile/${r.user_id}`)}
+              onLongPress={() => r.user_id !== profile.id && moderate('review', r.id, r.user_id)}
+              style={{ paddingTop: space.sm, gap: 2 }}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
+                <Avatar url={r.profile?.avatar_url} name={r.profile?.display_name} size={28} />
+                <Text style={[type.body, { fontWeight: '700' }]}>
+                  {r.rating > 0 ? `+${r.rating}` : r.rating} · {r.profile?.display_name ?? 'Member'}
+                </Text>
+              </View>
               {r.body ? <Text style={type.body}>{r.body}</Text> : null}
             </Pressable>
           ))}

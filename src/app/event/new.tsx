@@ -1,4 +1,4 @@
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, ScrollView, Text } from 'react-native';
 import { useAuth } from '../../lib/auth';
@@ -6,7 +6,7 @@ import { fetchSpots } from '../../lib/data';
 import { DAY_NAMES } from '../../lib/schedule';
 import { supabase } from '../../lib/supabase';
 import { space, type } from '../../lib/theme';
-import { DISCIPLINES, type Recurrence, type Spot, type StartType } from '../../lib/types';
+import { DISCIPLINES, MUSIC_LABEL, type JamEvent, type Music, type Recurrence, type Spot, type StartType } from '../../lib/types';
 import { Button, ChipGroup, Empty, Field, Screen, Segmented } from '../../lib/ui';
 
 /** Accepts "16:00", "4pm", "4:30 PM". Returns "HH:MM" or null. */
@@ -29,7 +29,9 @@ function nextDateFor(dow: number): string {
 }
 
 export default function NewJam() {
-  const params = useLocalSearchParams<{ spotId?: string }>();
+  // With ?id=… this screen edits an existing jam; otherwise it adds a new one.
+  const params = useLocalSearchParams<{ spotId?: string; id?: string }>();
+  const editingId = params.id;
   const { profile } = useAuth();
   const [spots, setSpots] = useState<Spot[]>([]);
   const [spotId, setSpotId] = useState(params.spotId ?? '');
@@ -43,18 +45,48 @@ export default function NewJam() {
   const [disciplines, setDisciplines] = useState<string[]>([]);
   const [description, setDescription] = useState('');
   const [organizer, setOrganizer] = useState('');
+  const [music, setMusic] = useState<Music | null>(null);
+  const [existing, setExisting] = useState<JamEvent | null>(null);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     fetchSpots().then(setSpots).catch(() => {});
   }, []);
 
+  // Load the jam being edited.
+  useEffect(() => {
+    if (!editingId) return;
+    supabase
+      .from('events')
+      .select('*')
+      .eq('id', editingId)
+      .maybeSingle()
+      .then(({ data }) => {
+        const e = data as JamEvent | null;
+        if (!e) return;
+        setExisting(e);
+        setSpotId(e.spot_id);
+        setName(e.name);
+        setRecurrence(e.recurrence);
+        setDay(e.day_of_week);
+        setStartType(e.start_type);
+        if (e.start_time) setTime(e.start_time.slice(0, 5));
+        setOffset(e.sunset_offset_min ?? 0);
+        setDuration(e.duration_min);
+        setDisciplines(e.disciplines ?? []);
+        setDescription(e.description ?? '');
+        setOrganizer(e.organizer ?? '');
+        setMusic(e.music);
+      });
+  }, [editingId]);
+
   const parsed = parseTime(time);
   const valid = name.trim() && spotId && (startType === 'sunset' || parsed);
 
   async function save() {
     setBusy(true);
-    const { error } = await supabase.from('events').insert({
+    const keepDate = existing?.start_date && existing.day_of_week === day && existing.recurrence === recurrence;
+    const fields = {
       name: name.trim(),
       spot_id: spotId,
       recurrence,
@@ -63,12 +95,16 @@ export default function NewJam() {
       start_time: startType === 'fixed' ? parsed : null,
       sunset_offset_min: startType === 'sunset' ? offset : 0,
       duration_min: duration,
-      start_date: recurrence === 'weekly' ? null : nextDateFor(day),
+      start_date: recurrence === 'weekly' ? null : keepDate ? existing!.start_date : nextDateFor(day),
       disciplines,
       description: description.trim() || null,
       organizer: organizer.trim() || null,
+      music,
       created_by: profile!.id,
-    });
+    };
+    const { error } = editingId
+      ? await supabase.from('events').update(fields).eq('id', editingId)
+      : await supabase.from('events').insert(fields);
     setBusy(false);
     if (error) return Alert.alert('Couldn’t save jam', error.message);
     router.back();
@@ -76,6 +112,7 @@ export default function NewJam() {
 
   return (
     <Screen>
+      <Stack.Screen options={{ title: editingId ? 'Edit jam' : 'Add a jam' }} />
       <ScrollView contentContainerStyle={{ padding: space.lg, gap: space.lg, paddingBottom: space.xxl * 2 }} keyboardShouldPersistTaps="handled">
         <Field label="Name" value={name} onChangeText={setName} placeholder="e.g. Wiggle Wednesdays" />
 
@@ -127,6 +164,16 @@ export default function NewJam() {
         <Text style={type.label}>Runs for</Text>
         <Segmented options={[60, 120, 180, 240].map((m) => ({ label: `${m / 60} hr`, value: m }))} value={duration} onChange={setDuration} />
 
+        <Text style={type.label}>Music</Text>
+        <Segmented<Music | 'unknown'>
+          options={[
+            { label: 'Not sure', value: 'unknown' },
+            ...(['dj', 'live', 'speaker', 'none'] as Music[]).map((m) => ({ label: MUSIC_LABEL[m], value: m })),
+          ]}
+          value={music ?? 'unknown'}
+          onChange={(v) => setMusic(v === 'unknown' ? null : v)}
+        />
+
         <Text style={type.label}>Disciplines</Text>
         <ChipGroup options={DISCIPLINES} value={disciplines} onChange={setDisciplines} />
 
@@ -134,6 +181,26 @@ export default function NewJam() {
         <Field label="Description (optional)" value={description} onChangeText={setDescription} multiline placeholder="What to bring, skill level, vibe…" />
 
         <Button title="Save jam" onPress={save} loading={busy} disabled={!valid} />
+        {editingId && existing?.created_by === profile?.id && (
+          <Button
+            title="Delete jam"
+            variant="danger"
+            onPress={() =>
+              Alert.alert('Delete this jam?', 'It will disappear for everyone.', [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                  text: 'Delete',
+                  style: 'destructive',
+                  onPress: async () => {
+                    const { error } = await supabase.from('events').delete().eq('id', editingId);
+                    if (error) Alert.alert('Couldn’t delete', error.message);
+                    else router.back();
+                  },
+                },
+              ])
+            }
+          />
+        )}
       </ScrollView>
     </Screen>
   );

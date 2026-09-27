@@ -9,11 +9,37 @@ export const DISCIPLINES = [
 ] as const;
 export type Discipline = (typeof DISCIPLINES)[number];
 
+/** Things people are into beyond what they practice. */
+export const INTERESTS = [
+  'Teaching',
+  'Learning',
+  'Fire spinning',
+  'LED / glow',
+  'Prop making',
+  'Photo & video',
+  'DJing',
+  'Live music',
+  'Festivals',
+  'Workshops',
+  'Yoga',
+  'Beach cleanups',
+] as const;
+
+export type Music = 'none' | 'speaker' | 'dj' | 'live';
+export const MUSIC_LABEL: Record<Music, string> = {
+  none: 'No music',
+  speaker: 'Speaker',
+  dj: 'DJ',
+  live: 'Live music',
+};
+
 export type Profile = {
   id: string;
   display_name: string;
   disciplines: string[];
   bio: string | null;
+  interests: string[];
+  avatar_url: string | null;
   alerts_enabled: boolean;
   alert_radius_miles: number;
   home_lat: number | null;
@@ -57,6 +83,7 @@ export type JamEvent = {
   duration_min: number;
   start_date: string | null; // anchor date for biweekly / date for once
   organizer: string | null;
+  music: Music | null;
   created_by: string | null;
   created_at: string;
   spot?: Pick<Spot, 'id' | 'name' | 'lat' | 'lng' | 'address'>;
@@ -70,7 +97,7 @@ export type Session = {
   note: string | null;
   starts_at: string;
   ends_at: string;
-  profile?: Pick<Profile, 'display_name'>;
+  profile?: Pick<Profile, 'display_name' | 'avatar_url'>;
 };
 
 export type Review = {
@@ -80,7 +107,7 @@ export type Review = {
   rating: number; // -5 .. +5
   body: string | null;
   created_at: string;
-  profile?: Pick<Profile, 'display_name'>;
+  profile?: Pick<Profile, 'display_name' | 'avatar_url'>;
 };
 
 export type Invite = {
@@ -90,3 +117,7 @@ export type Invite = {
   used_at: string | null;
   created_at: string;
 };
+
+/** What any member can see about another member. */
+export type PublicProfile = Pick<Profile, 'id' | 'display_name' | 'disciplines' | 'interests' | 'bio' | 'avatar_url' | 'created_at'>;
+export const PUBLIC_PROFILE_COLUMNS = 'id, display_name, disciplines, interests, bio, avatar_url, created_at';

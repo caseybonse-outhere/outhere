@@ -4,7 +4,7 @@ Invite-only map of movement-arts spots, weekly jams, and who's out right now —
 
 **Stack:** Expo (React Native, SDK 57) + Expo Router · Supabase (database, email sign-in, edge function) · Expo push notifications.
 
-## What's in v0.1
+## What's in v0.2
 
 | Feature | Where |
 |---|---|
@@ -13,7 +13,9 @@ Invite-only map of movement-arts spots, weekly jams, and who's out right now —
 | **"I'm out here" sessions** — check in at a spot until 1–3 h or sunset; auto-expires | `src/app/spot/[id].tsx` |
 | **Nearby alerts** — members pick a radius (1–50 mi); new jams and check-ins push to everyone in range | `src/app/(tabs)/me.tsx`, `supabase/functions/notify-nearby` |
 | **Invite-only** — email code sign-in, then an invite code; each member gets 3 codes | `src/app/sign-in.tsx`, `src/app/invite.tsx` |
-| **App Store basics** — report, block, delete account | spot screen, Me tab |
+| **Profiles** — photo, bio, what you do, what you're into; tap anyone checked in or reviewing to see theirs | `src/app/(tabs)/me.tsx`, `src/app/profile/[id].tsx` |
+| **Music at jams** — DJ / live / speaker badge, filter jams by DJ or any music, edit jams | `src/app/(tabs)/jams.tsx`, `src/app/event/new.tsx` |
+| **App Store basics** — report, block, delete account | spot screen, profile screen, Me tab |
 
 Privacy: the app stores each member's area rounded to ~1 km, never their exact location, and other members can't read it.
 
@@ -33,7 +35,7 @@ npm install
 ### 2. Supabase (free tier)
 
 1. Create a project at [supabase.com](https://supabase.com).
-2. **SQL Editor → New query**: paste and run `supabase/migrations/0001_init.sql`, then `supabase/seed.sql`.
+2. **SQL Editor → New query**: paste and run, one at a time and in this order: `supabase/migrations/0001_init.sql`, `supabase/seed.sql`, `supabase/migrations/0002_profiles_music.sql`.
 3. **Authentication → Emails → Templates → Magic Link**: make sure the email includes the code, e.g. add
    `<p>Your Out Here code: <strong>{{ .Token }}</strong></p>`. (The app signs in with the code, not the link.)
 4. **Project Settings → API**: copy the Project URL and the `anon` public key.

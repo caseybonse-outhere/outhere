@@ -10,7 +10,7 @@ export async function fetchSpots(): Promise<Spot[]> {
 export async function fetchActiveSessions(spotId?: string): Promise<Session[]> {
   let q = supabase
     .from('sessions')
-    .select('*, profile:profiles(display_name)')
+    .select('*, profile:profiles(display_name, avatar_url)')
     .gt('ends_at', new Date().toISOString())
     .lte('starts_at', new Date().toISOString())
     .order('starts_at', { ascending: false });
@@ -31,7 +31,7 @@ export async function fetchEvents(spotId?: string): Promise<JamEvent[]> {
 export async function fetchReviews(spotId: string): Promise<Review[]> {
   const { data, error } = await supabase
     .from('spot_reviews')
-    .select('*, profile:profiles(display_name)')
+    .select('*, profile:profiles(display_name, avatar_url)')
     .eq('spot_id', spotId)
     .order('created_at', { ascending: false });
   if (error) throw error;

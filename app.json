@@ -3,7 +3,7 @@
     "name": "Out Here",
     "slug": "outhere",
     "scheme": "outhere",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -42,6 +42,14 @@
         "expo-calendar",
         {
           "calendarPermission": "Out Here adds jams you choose to your calendar."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Out Here uses your photos so you can choose a profile picture.",
+          "cameraPermission": false,
+          "microphonePermission": false
         }
       ]
     ]

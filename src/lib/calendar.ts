@@ -1,11 +1,23 @@
 import * as Calendar from 'expo-calendar/legacy';
-import { Alert } from 'react-native';
+import { Alert, Linking } from 'react-native';
 import { describeSchedule, type Occurrence } from './schedule';
 import type { JamEvent } from './types';
 
 /** Opens the system "new event" sheet pre-filled with the jam, repeating weekly when it's a regular jam. */
 export async function addJamToCalendar(event: JamEvent, occ: Occurrence) {
   try {
+    const { status } = await Calendar.requestCalendarPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert(
+        'Calendar access is off',
+        'To add jams to your calendar, allow calendar access for this app in the iPhone Settings app.',
+        [
+          { text: 'Not now', style: 'cancel' },
+          { text: 'Open Settings', onPress: () => Linking.openSettings() },
+        ],
+      );
+      return;
+    }
     const repeating = event.recurrence !== 'once';
     await Calendar.createEventInCalendarAsync({
       title: event.name,
