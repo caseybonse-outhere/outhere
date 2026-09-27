@@ -35,7 +35,7 @@ npm install
 1. Create a project at [supabase.com](https://supabase.com).
 2. **SQL Editor → New query**: paste and run `supabase/migrations/0001_init.sql`, then `supabase/seed.sql`.
 3. **Authentication → Emails → Templates → Magic Link**: make sure the email includes the code, e.g. add
-   `<p>Your Out Here code: <strong>{{ .Token }}</strong></p>`. (The app signs in with the 6-digit code, not the link.)
+   `<p>Your Out Here code: <strong>{{ .Token }}</strong></p>`. (The app signs in with the code, not the link.)
 4. **Project Settings → API**: copy the Project URL and the `anon` public key.
 5. In the project folder: `cp .env.example .env` and paste both values in.
 

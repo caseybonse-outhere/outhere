@@ -50,8 +50,9 @@ export default function SignIn() {
           </View>
         ) : (
           <View style={styles.form}>
-            <Text style={type.body}>We sent a 6-digit code to {email}.</Text>
-            <Field label="Code" value={code} onChangeText={setCode} keyboardType="number-pad" autoComplete="one-time-code" placeholder="123456" maxLength={6} />
+            <Text style={type.body}>We sent a sign-in code to {email}.</Text>
+            {/* Supabase projects can send 6–10 digit codes depending on the Email OTP Length setting. */}
+            <Field label="Code" value={code} onChangeText={(t) => setCode(t.replace(/\D/g, ''))} keyboardType="number-pad" autoComplete="one-time-code" placeholder="12345678" maxLength={10} />
             <Button title="Sign in" onPress={verify} loading={busy} disabled={code.trim().length < 6} />
             <Button title="Use a different email" variant="ghost" onPress={() => setSent(false)} />
           </View>
