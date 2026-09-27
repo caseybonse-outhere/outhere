@@ -6,6 +6,7 @@ export const DISCIPLINES = [
   'Rings & Gymnastics',
   'Dance',
   'Juggling',
+  'Yoga',
 ] as const;
 export type Discipline = (typeof DISCIPLINES)[number];
 
@@ -21,7 +22,7 @@ export const INTERESTS = [
   'Live music',
   'Festivals',
   'Workshops',
-  'Yoga',
+  'Meditation',
   'Beach cleanups',
 ] as const;
 
