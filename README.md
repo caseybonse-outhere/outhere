@@ -38,7 +38,7 @@ npm install
 ### 2. Supabase (free tier)
 
 1. Create a project at [supabase.com](https://supabase.com).
-2. **SQL Editor → New query**: paste and run, one at a time and in this order: `supabase/migrations/0001_init.sql`, `supabase/seed.sql`, `supabase/migrations/0002_profiles_music.sql`, `supabase/migrations/0003_lines_messages_jam_members.sql`, `supabase/migrations/0004_photos.sql`, `supabase/migrations/0005_remove_gallery_messages.sql`.
+2. **SQL Editor → New query**: paste and run, one at a time and in this order: `supabase/migrations/0001_init.sql`, `supabase/seed.sql`, `supabase/migrations/0002_profiles_music.sql`, `supabase/migrations/0003_lines_messages_jam_members.sql`, `supabase/migrations/0004_photos.sql`, `supabase/migrations/0005_remove_gallery_messages.sql`, `supabase/migrations/0006_repair.sql`.
 3. **Authentication → Emails → Templates → Magic Link**: make sure the email includes the code, e.g. add
    `<p>Your OUTHERENOW code: <strong>{{ .Token }}</strong></p>`. (The app signs in with the code, not the link.)
 4. **Project Settings → API**: copy the Project URL and the `anon` public key.

@@ -36,6 +36,7 @@ export default function Jams() {
   const [filter, setFilter] = useState<JamFilter>('all');
   const [myJams, setMyJams] = useState<Set<string>>(new Set());
   const [lineSpots, setLineSpots] = useState<Set<string>>(new Set());
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setRefreshing(true);
@@ -48,8 +49,9 @@ export default function Jams() {
       setEvents(e);
       setMyJams(mine);
       setLineSpots(new Set(lines.map((l) => l.spot_id)));
-    } catch {
-      // keep what we had
+      setLoadError(null);
+    } catch (err) {
+      setLoadError(err instanceof Error ? err.message : String((err as { message?: string })?.message ?? err));
     }
     setRefreshing(false);
   }, [profile?.id]);
@@ -87,7 +89,18 @@ export default function Jams() {
         keyExtractor={(x) => x.event.id}
         contentContainerStyle={{ padding: space.lg, gap: space.md }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={load} />}
-        ListHeaderComponent={<Segmented options={FILTERS} value={filter} onChange={setFilter} />}
+        ListHeaderComponent={
+          <View style={{ gap: space.md }}>
+            <Segmented options={FILTERS} value={filter} onChange={setFilter} />
+            {loadError && (
+              <Card style={{ borderColor: colors.coralDark }}>
+                <Text style={[type.body, { fontWeight: '700' }]}>Couldn’t load jams</Text>
+                <Text style={type.small}>{loadError}</Text>
+                <Button title="Try again" variant="ghost" onPress={load} />
+              </Card>
+            )}
+          </View>
+        }
         ListEmptyComponent={
           <Empty
             text={

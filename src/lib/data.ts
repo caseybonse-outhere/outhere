@@ -20,12 +20,20 @@ export async function fetchActiveSessions(spotId?: string): Promise<Session[]> {
   return (data ?? []) as Session[];
 }
 
+const EVENT_SPOT = 'spot:spots(id, name, lat, lng, address, disciplines)';
+
 export async function fetchEvents(spotId?: string): Promise<JamEvent[]> {
-  let q = supabase.from('events').select('*, spot:spots(id, name, lat, lng, address, disciplines), jam_members(count)');
-  if (spotId) q = q.eq('spot_id', spotId);
-  const { data, error } = await q;
+  const query = (withCounts: boolean) => {
+    const columns: string = withCounts ? `*, ${EVENT_SPOT}, jam_members(count)` : `*, ${EVENT_SPOT}`;
+    let q = supabase.from('events').select(columns);
+    if (spotId) q = q.eq('spot_id', spotId);
+    return q;
+  };
+  let { data, error } = await query(true);
+  // If member counts aren't available (e.g. a database update is missing), still show the jams.
+  if (error) ({ data, error } = await query(false));
   if (error) throw error;
-  return ((data ?? []) as JamEvent[]).filter((e) => e.spot);
+  return ((data ?? []) as unknown as JamEvent[]).filter((e) => e.spot);
 }
 
 export async function fetchReviews(spotId: string): Promise<Review[]> {
