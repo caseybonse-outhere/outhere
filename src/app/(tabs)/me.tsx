@@ -3,12 +3,10 @@ import { useCallback, useEffect, useState } from 'react';
 import { Alert, Pressable, ScrollView, Share, Switch, Text, View } from 'react-native';
 import { useAuth } from '../../lib/auth';
 import { Avatar, pickAndUploadAvatar } from '../../lib/avatar';
-import { fetchPhotos } from '../../lib/data';
 import { syncHomeArea } from '../../lib/device';
-import { GalleryCard } from '../../lib/gallery';
 import { supabase } from '../../lib/supabase';
 import { colors, space, type } from '../../lib/theme';
-import { DISCIPLINES, INTERESTS, type Invite, type Photo, type Profile } from '../../lib/types';
+import { DISCIPLINES, INTERESTS, type Invite, type Profile } from '../../lib/types';
 import { Button, Card, ChipGroup, Field, Screen, Segmented } from '../../lib/ui';
 
 const RADII = [1, 5, 10, 25, 50];
@@ -16,8 +14,6 @@ const RADII = [1, 5, 10, 25, 50];
 export default function Me() {
   const { profile, refreshProfile, signOut } = useAuth();
   const [invites, setInvites] = useState<Invite[]>([]);
-  const [photos, setPhotos] = useState<Photo[]>([]);
-  const [photoTotal, setPhotoTotal] = useState(0);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -42,15 +38,7 @@ export default function Me() {
         .select('*')
         .order('created_at')
         .then(({ data }) => setInvites((data ?? []) as Invite[]));
-      if (profile?.id) {
-        fetchPhotos(profile.id, 6)
-          .then(({ photos: p, total }) => {
-            setPhotos(p);
-            setPhotoTotal(total);
-          })
-          .catch(() => {});
-      }
-    }, [profile?.id]),
+    }, []),
   );
 
   if (!profile) return null;
@@ -132,8 +120,6 @@ export default function Me() {
           <ChipGroup options={INTERESTS} value={interests} onChange={setInterests} />
           <Button title={dirty ? 'Save profile' : 'Saved'} onPress={saveProfile} loading={saving} disabled={!dirty} />
         </Card>
-
-        <GalleryCard userId={profile.id} photos={photos} total={photoTotal} isMe />
 
         {/* Alerts */}
         <Card>

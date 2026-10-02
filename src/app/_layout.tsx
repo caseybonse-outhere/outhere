@@ -33,12 +33,10 @@ function Gate() {
     registerForPush(profile.id);
   }, [profile?.id]);
 
-  // Tapping an alert opens the conversation or the spot it's about.
+  // Tapping an alert opens the spot it's about.
   useEffect(() => {
-    const data = lastResponse?.notification.request.content.data;
-    if (!profile || !data) return;
-    if (typeof data.messageFrom === 'string') router.push(`/messages/${data.messageFrom}`);
-    else if (typeof data.spotId === 'string') router.push(`/spot/${data.spotId}`);
+    const spotId = lastResponse?.notification.request.content.data?.spotId;
+    if (profile && typeof spotId === 'string') router.push(`/spot/${spotId}`);
   }, [lastResponse, profile]);
 
   if (loading) {
@@ -94,10 +92,6 @@ export default function RootLayout() {
         <Stack.Screen name="event/new" options={{ title: 'Jam', presentation: 'modal' }} />
         <Stack.Screen name="profile/[id]" options={{ title: '' }} />
         <Stack.Screen name="jam/[id]" options={{ title: '' }} />
-        <Stack.Screen name="messages/[id]" options={{ title: '' }} />
-        <Stack.Screen name="photo/new" options={{ title: 'New photo', presentation: 'modal' }} />
-        <Stack.Screen name="photo/[id]" options={{ title: '' }} />
-        <Stack.Screen name="gallery/[id]" options={{ title: 'Gallery' }} />
       </Stack>
       <Gate />
     </AuthProvider>

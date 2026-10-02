@@ -58,7 +58,7 @@ export default function NewSpot() {
         <ChipGroup options={DISCIPLINES} value={disciplines} onChange={setDisciplines} />
         <Field label="Features" value={features} onChangeText={setFeatures} multiline placeholder="Anchor trees, span length, rails, shade, mats…" />
         <Text style={type.label}>Surface</Text>
-        <Segmented options={['Grass', 'Sand', 'Concrete', 'Wood', 'Mixed'].map((v) => ({ label: v, value: v }))} value={surface} onChange={setSurface} />
+        <Segmented options={['Grass', 'Sand', 'Concrete', 'Wood', 'Trail', 'Mixed'].map((v) => ({ label: v, value: v }))} value={surface} onChange={setSurface} />
         <Text style={type.label}>Fire</Text>
         <Segmented<Spot['fire_allowed']>
           options={[

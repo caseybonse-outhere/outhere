@@ -1,13 +1,12 @@
 // Supabase Edge Function: push notifications for Out Here.
 //  • events / sessions / lines INSERT → members whose alert radius covers the spot
-//  • messages INSERT → the recipient
 // Triggered by Database Webhooks (see README). Deploy:
 //   npx supabase functions deploy notify-nearby --no-verify-jwt
 //   npx supabase secrets set WEBHOOK_SECRET=<random string>
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
-type Table = 'events' | 'sessions' | 'lines' | 'messages';
+type Table = 'events' | 'sessions' | 'lines';
 type WebhookPayload = { type: 'INSERT' | 'UPDATE' | 'DELETE'; table: Table; record: Record<string, unknown> };
 type Push = { to: string; title: string; body: string; sound: 'default'; data: Record<string, string> };
 
@@ -38,32 +37,6 @@ async function send(messages: Push[]) {
   }
 }
 
-async function notifyRecipient(rec: Record<string, unknown>) {
-  const { data: to } = await supabase
-    .from('profiles')
-    .select('push_token')
-    .eq('id', rec.recipient_id)
-    .single();
-  if (!to?.push_token) return 'no token';
-  // Respect blocks in either direction.
-  const { count } = await supabase
-    .from('blocks')
-    .select('*', { count: 'exact', head: true })
-    .or(`and(blocker_id.eq.${rec.recipient_id},blocked_id.eq.${rec.sender_id}),and(blocker_id.eq.${rec.sender_id},blocked_id.eq.${rec.recipient_id})`);
-  if (count) return 'blocked';
-  const from = await displayName(rec.sender_id as string);
-  const body = String(rec.body ?? '');
-  await send([
-    {
-      to: to.push_token,
-      title: from,
-      body: body.length > 140 ? `${body.slice(0, 137)}…` : body,
-      sound: 'default',
-      data: { messageFrom: String(rec.sender_id) },
-    },
-  ]);
-  return 'sent 1';
-}
 
 async function notifyNearby(table: Table, rec: Record<string, unknown>) {
   const { data: spot } = await supabase.from('spots').select('name, lat, lng, is_public').eq('id', rec.spot_id).single();
@@ -102,6 +75,5 @@ Deno.serve(async (req) => {
   const payload = (await req.json()) as WebhookPayload;
   if (payload.type !== 'INSERT') return new Response('ignored');
 
-  const result = payload.table === 'messages' ? await notifyRecipient(payload.record) : await notifyNearby(payload.table, payload.record);
-  return new Response(result);
+  return new Response(await notifyNearby(payload.table, payload.record));
 });

@@ -7,6 +7,7 @@ export const DISCIPLINES = [
   'Dance',
   'Juggling',
   'Yoga',
+  'Hiking',
 ] as const;
 export type Discipline = (typeof DISCIPLINES)[number];
 
@@ -148,25 +149,6 @@ export type Line = {
   profile?: Pick<Profile, 'display_name' | 'avatar_url'>;
 };
 
-export type Message = {
-  id: string;
-  sender_id: string;
-  recipient_id: string;
-  body: string;
-  created_at: string;
-  read_at: string | null;
-};
-
-export type Thread = {
-  other_id: string;
-  display_name: string;
-  avatar_url: string | null;
-  last_body: string;
-  last_at: string;
-  last_from_me: boolean;
-  unread: number;
-};
-
 export type JamMember = {
   event_id: string;
   user_id: string;
@@ -177,17 +159,3 @@ export type JamMember = {
 
 /** Slackline is the discipline that unlocks "the line is up". */
 export const SLACKLINE = 'Slackline';
-
-export const MAX_PHOTOS = 99;
-
-export type Photo = {
-  id: string;
-  user_id: string;
-  storage_path: string;
-  url: string;
-  caption: string | null;
-  spot_id: string | null;
-  width: number | null;
-  height: number | null;
-  created_at: string;
-};

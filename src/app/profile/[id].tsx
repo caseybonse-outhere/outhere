@@ -1,13 +1,12 @@
-import { router, Stack, useLocalSearchParams } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, ScrollView, Text, View } from 'react-native';
 import { useAuth } from '../../lib/auth';
 import { Avatar } from '../../lib/avatar';
-import { block, fetchPhotos, report } from '../../lib/data';
-import { GalleryCard } from '../../lib/gallery';
+import { block, report } from '../../lib/data';
 import { supabase } from '../../lib/supabase';
 import { space, type } from '../../lib/theme';
-import { PUBLIC_PROFILE_COLUMNS, type Photo, type PublicProfile } from '../../lib/types';
+import { PUBLIC_PROFILE_COLUMNS, type PublicProfile } from '../../lib/types';
 import { Button, Card, Chip, Empty, Screen } from '../../lib/ui';
 
 export default function ProfileScreen() {
@@ -15,8 +14,6 @@ export default function ProfileScreen() {
   const { profile: me } = useAuth();
   const [person, setPerson] = useState<PublicProfile | null>(null);
   const [loaded, setLoaded] = useState(false);
-  const [photos, setPhotos] = useState<Photo[]>([]);
-  const [photoTotal, setPhotoTotal] = useState(0);
 
   useEffect(() => {
     supabase
@@ -28,12 +25,6 @@ export default function ProfileScreen() {
         setPerson(data as PublicProfile | null);
         setLoaded(true);
       });
-    fetchPhotos(id, 6)
-      .then(({ photos: p, total }) => {
-        setPhotos(p);
-        setPhotoTotal(total);
-      })
-      .catch(() => {});
   }, [id]);
 
   if (!person) {
@@ -85,11 +76,8 @@ export default function ProfileScreen() {
           </Card>
         )}
 
-        <GalleryCard userId={person.id} photos={photos} total={photoTotal} isMe={isMe} name={person.display_name} />
-
         {!isMe && me && (
           <View style={{ gap: space.sm }}>
-            <Button title={`Message ${person.display_name}`} onPress={() => router.push(`/messages/${person.id}`)} />
             <Button
               title="Report"
               variant="ghost"

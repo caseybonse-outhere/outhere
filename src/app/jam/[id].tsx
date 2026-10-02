@@ -56,7 +56,6 @@ export default function JamScreen() {
   const spot = jam.spot;
   const occ = nextOccurrence(jam, spot.lat, spot.lng);
   const me = members.find((m) => m.user_id === profile.id);
-  const organizers = members.filter((m) => m.role === 'organizer');
   const slackliney = jam.disciplines.includes(SLACKLINE) || (spot.disciplines ?? []).includes(SLACKLINE);
   const canEdit = jam.created_by === profile.id || jam.created_by == null;
 
@@ -170,13 +169,6 @@ export default function JamScreen() {
         {/* Actions */}
         <View style={{ gap: space.sm }}>
           {occ && <Button title="Add to calendar" variant="secondary" onPress={() => addJamToCalendar(jam, occ)} />}
-          {organizers[0] && organizers[0].user_id !== profile.id && (
-            <Button
-              title={`Message ${organizers[0].profile?.display_name ?? 'the organizer'}`}
-              variant="ghost"
-              onPress={() => router.push(`/messages/${organizers[0].user_id}`)}
-            />
-          )}
           {canEdit && <Button title="Edit jam" variant="ghost" onPress={() => router.push({ pathname: '/event/new', params: { id: jam.id } })} />}
         </View>
       </ScrollView>

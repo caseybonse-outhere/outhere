@@ -9,6 +9,7 @@ const ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
   Dance: 'musical-notes',
   Acro: 'people',
   Yoga: 'leaf',
+  Hiking: 'trail-sign',
   Parkour: 'walk',
   Juggling: 'ellipse',
   'Rings & Gymnastics': 'fitness',
