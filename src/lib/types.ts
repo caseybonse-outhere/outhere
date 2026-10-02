@@ -85,6 +85,7 @@ export type JamEvent = {
   start_date: string | null; // anchor date for biweekly / date for once
   organizer: string | null;
   music: Music | null;
+  cover_url: string | null;
   created_by: string | null;
   created_at: string;
   spot?: Pick<Spot, 'id' | 'name' | 'lat' | 'lng' | 'address' | 'disciplines'>;
@@ -176,3 +177,17 @@ export type JamMember = {
 
 /** Slackline is the discipline that unlocks "the line is up". */
 export const SLACKLINE = 'Slackline';
+
+export const MAX_PHOTOS = 99;
+
+export type Photo = {
+  id: string;
+  user_id: string;
+  storage_path: string;
+  url: string;
+  caption: string | null;
+  spot_id: string | null;
+  width: number | null;
+  height: number | null;
+  created_at: string;
+};

@@ -1,21 +1,23 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { Alert, Image, Pressable, ScrollView, Text, useWindowDimensions, View } from 'react-native';
 import { useAuth } from '../../lib/auth';
 import { Avatar } from '../../lib/avatar';
 import { addJamToCalendar } from '../../lib/calendar';
 import { fetchActiveLines, fetchJamMembers } from '../../lib/data';
+import { JamThumb } from '../../lib/jamPhoto';
 import { LineSection } from '../../lib/lines';
 import { describeSchedule, formatWhen, nextOccurrence } from '../../lib/schedule';
 import { supabase } from '../../lib/supabase';
-import { colors, space, type } from '../../lib/theme';
+import { colors, radius, space, type } from '../../lib/theme';
 import { MUSIC_LABEL, SLACKLINE, type JamEvent, type JamMember, type Line } from '../../lib/types';
 import { Button, Card, Chip, Empty, Screen } from '../../lib/ui';
 
 export default function JamScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { profile } = useAuth();
+  const { width } = useWindowDimensions();
   const [jam, setJam] = useState<JamEvent | null>(null);
   const [members, setMembers] = useState<JamMember[]>([]);
   const [lines, setLines] = useState<Line[]>([]);
@@ -87,6 +89,17 @@ export default function JamScreen() {
     <Screen>
       <Stack.Screen options={{ title: jam.name }} />
       <ScrollView contentContainerStyle={{ padding: space.lg, gap: space.lg, paddingBottom: space.xxl * 2 }}>
+        {/* Cover */}
+        {jam.cover_url ? (
+          <Image
+            source={{ uri: jam.cover_url }}
+            accessibilityLabel={`${jam.name} photo`}
+            style={{ width: width - space.lg * 2, height: Math.round((width - space.lg * 2) * 0.66), borderRadius: radius.lg, backgroundColor: colors.sand2 }}
+          />
+        ) : (
+          <JamThumb jam={jam} size={88} />
+        )}
+
         {/* Header */}
         <View style={{ gap: space.xs }}>
           {occ && (

@@ -5,6 +5,7 @@ import { useAuth } from '../../lib/auth';
 import { Avatar } from '../../lib/avatar';
 import { addJamToCalendar } from '../../lib/calendar';
 import { block, fetchActiveLines, fetchActiveSessions, fetchEvents, fetchReviews, report } from '../../lib/data';
+import { JamThumb } from '../../lib/jamPhoto';
 import { LineSection } from '../../lib/lines';
 import { describeSchedule, formatTime, formatWhen, nextOccurrence, sunsetToday } from '../../lib/schedule';
 import { supabase } from '../../lib/supabase';
@@ -180,8 +181,9 @@ export default function SpotScreen() {
             const occ = nextOccurrence(e, s.lat, s.lng);
             return (
               <View key={e.id} style={{ gap: 2, paddingVertical: space.xs }}>
-                <Pressable accessibilityRole="button" onPress={() => router.push(`/jam/${e.id}`)} style={{ minHeight: 32, justifyContent: 'center' }}>
-                  <Text style={[type.body, { fontWeight: '700', color: colors.coralDark }]}>{e.name} ›</Text>
+                <Pressable accessibilityRole="button" onPress={() => router.push(`/jam/${e.id}`)} style={{ minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: space.md }}>
+                  <JamThumb jam={e} size={44} />
+                  <Text style={[type.body, { flex: 1, fontWeight: '700', color: colors.coralDark }]}>{e.name} ›</Text>
                 </Pressable>
                 <Text style={type.small}>
                   {describeSchedule(e)}

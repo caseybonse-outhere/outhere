@@ -95,6 +95,9 @@ export default function RootLayout() {
         <Stack.Screen name="profile/[id]" options={{ title: '' }} />
         <Stack.Screen name="jam/[id]" options={{ title: '' }} />
         <Stack.Screen name="messages/[id]" options={{ title: '' }} />
+        <Stack.Screen name="photo/new" options={{ title: 'New photo', presentation: 'modal' }} />
+        <Stack.Screen name="photo/[id]" options={{ title: '' }} />
+        <Stack.Screen name="gallery/[id]" options={{ title: 'Gallery' }} />
       </Stack>
       <Gate />
     </AuthProvider>

@@ -4,7 +4,7 @@ Invite-only map of movement-arts spots, weekly jams, and who's out right now —
 
 **Stack:** Expo (React Native, SDK 57) + Expo Router · Supabase (database, email sign-in, edge function) · Expo push notifications.
 
-## What's in v0.3
+## What's in v0.4
 
 | Feature | Where |
 |---|---|
@@ -18,6 +18,8 @@ Invite-only map of movement-arts spots, weekly jams, and who's out right now —
 | **The line is up** — on slackline spots and jams, post what's rigged (type, length, until when); pin turns green | `src/lib/lines.tsx` |
 | **Direct messages** — Messages tab with unread badge, live chat, Message button on profiles; blocks respected | `src/app/(tabs)/messages.tsx`, `src/app/messages/[id].tsx` |
 | **Jam communities** — jam page with Join / Leave, members and organizer, My jams filter | `src/app/jam/[id].tsx` |
+| **Photo galleries** — take or choose photos (auto-resized), captions, up to 99 per member; on the Me tab and every profile | `src/lib/gallery.tsx`, `src/app/photo/`, `src/app/gallery/[id].tsx` |
+| **Jam photos** — cover photo per jam; thumbnails on jam cards and spot pages, big photo on the jam page | `src/lib/jamPhoto.tsx`, `src/app/event/new.tsx` |
 | **App Store basics** — report, block, delete account | spot screen, profile screen, Me tab |
 
 Privacy: the app stores each member's area rounded to ~1 km, never their exact location, and other members can't read it.
@@ -38,7 +40,7 @@ npm install
 ### 2. Supabase (free tier)
 
 1. Create a project at [supabase.com](https://supabase.com).
-2. **SQL Editor → New query**: paste and run, one at a time and in this order: `supabase/migrations/0001_init.sql`, `supabase/seed.sql`, `supabase/migrations/0002_profiles_music.sql`, `supabase/migrations/0003_lines_messages_jam_members.sql`.
+2. **SQL Editor → New query**: paste and run, one at a time and in this order: `supabase/migrations/0001_init.sql`, `supabase/seed.sql`, `supabase/migrations/0002_profiles_music.sql`, `supabase/migrations/0003_lines_messages_jam_members.sql`, `supabase/migrations/0004_photos.sql`.
 3. **Authentication → Emails → Templates → Magic Link**: make sure the email includes the code, e.g. add
    `<p>Your Out Here code: <strong>{{ .Token }}</strong></p>`. (The app signs in with the code, not the link.)
 4. **Project Settings → API**: copy the Project URL and the `anon` public key.

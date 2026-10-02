@@ -1,11 +1,12 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, ScrollView, Text } from 'react-native';
+import { Alert, Image, ScrollView, Text, View } from 'react-native';
 import { useAuth } from '../../lib/auth';
 import { fetchSpots } from '../../lib/data';
+import { chooseSource, pickImage, uploadImage } from '../../lib/images';
 import { DAY_NAMES } from '../../lib/schedule';
 import { supabase } from '../../lib/supabase';
-import { space, type } from '../../lib/theme';
+import { colors, radius, space, type } from '../../lib/theme';
 import { DISCIPLINES, MUSIC_LABEL, type JamEvent, type Music, type Recurrence, type Spot, type StartType } from '../../lib/types';
 import { Button, ChipGroup, Empty, Field, Screen, Segmented } from '../../lib/ui';
 
@@ -46,6 +47,8 @@ export default function NewJam() {
   const [description, setDescription] = useState('');
   const [organizer, setOrganizer] = useState('');
   const [music, setMusic] = useState<Music | null>(null);
+  const [coverUrl, setCoverUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [existing, setExisting] = useState<JamEvent | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -77,11 +80,27 @@ export default function NewJam() {
         setDescription(e.description ?? '');
         setOrganizer(e.organizer ?? '');
         setMusic(e.music);
+        setCoverUrl(e.cover_url);
       });
   }, [editingId]);
 
   const parsed = parseTime(time);
   const valid = name.trim() && spotId && (startType === 'sunset' || parsed);
+
+  async function changeCover() {
+    const source = await chooseSource('Jam photo');
+    if (!source) return;
+    try {
+      setUploading(true);
+      const img = await pickImage(source, { square: true, maxSize: 1200 });
+      if (!img) return;
+      setCoverUrl(await uploadImage('photos', `${profile!.id}/jams/${Date.now()}.jpg`, img.uri));
+    } catch (e) {
+      Alert.alert('Couldn’t add photo', e instanceof Error ? e.message : String(e));
+    } finally {
+      setUploading(false);
+    }
+  }
 
   async function save() {
     setBusy(true);
@@ -100,6 +119,7 @@ export default function NewJam() {
       description: description.trim() || null,
       organizer: organizer.trim() || null,
       music,
+      cover_url: coverUrl,
       created_by: profile!.id,
     };
     const { error } = editingId
@@ -114,6 +134,19 @@ export default function NewJam() {
     <Screen>
       <Stack.Screen options={{ title: editingId ? 'Edit jam' : 'Add a jam' }} />
       <ScrollView contentContainerStyle={{ padding: space.lg, gap: space.lg, paddingBottom: space.xxl * 2 }} keyboardShouldPersistTaps="handled">
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.lg }}>
+          {coverUrl ? (
+            <Image source={{ uri: coverUrl }} accessibilityLabel="Jam photo" style={{ width: 96, height: 96, borderRadius: radius.md, backgroundColor: colors.sand2 }} />
+          ) : (
+            <View style={{ width: 96, height: 96, borderRadius: radius.md, backgroundColor: colors.sand2, borderWidth: 1, borderColor: colors.line, borderStyle: 'dashed' }} />
+          )}
+          <View style={{ flex: 1, gap: space.xs }}>
+            <Text style={type.label}>Jam photo</Text>
+            <Button title={uploading ? 'Uploading…' : coverUrl ? 'Change photo' : 'Add photo'} variant="ghost" onPress={changeCover} disabled={uploading} />
+            {coverUrl && !uploading && <Button title="Remove" variant="ghost" onPress={() => setCoverUrl(null)} />}
+          </View>
+        </View>
+
         <Field label="Name" value={name} onChangeText={setName} placeholder="e.g. Wiggle Wednesdays" />
 
         <Text style={type.label}>Spot</Text>

@@ -3,7 +3,7 @@
     "name": "Out Here",
     "slug": "outhere",
     "scheme": "outhere",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -47,8 +47,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Out Here uses your photos so you can choose a profile picture.",
-          "cameraPermission": false,
+          "photosPermission": "Out Here uses your photos so you can add them to your gallery, profile and jams.",
+          "cameraPermission": "Out Here uses the camera so you can take photos for your gallery, profile and jams.",
           "microphonePermission": false
         }
       ]

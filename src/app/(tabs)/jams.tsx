@@ -5,6 +5,7 @@ import { FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
 import { useAuth } from '../../lib/auth';
 import { addJamToCalendar } from '../../lib/calendar';
 import { fetchActiveLines, fetchEvents, fetchMyJamIds } from '../../lib/data';
+import { JamThumb } from '../../lib/jamPhoto';
 import { LineUpBadge } from '../../lib/lines';
 import { describeSchedule, formatWhen, nextOccurrence } from '../../lib/schedule';
 import { colors, radius, space, type } from '../../lib/theme';
@@ -99,9 +100,12 @@ export default function Jams() {
         renderItem={({ item: { event, occ } }) => (
           <Pressable accessibilityRole="button" onPress={() => router.push(`/jam/${event.id}`)}>
             <Card>
-              <Text style={[type.small, { color: occ!.happeningNow ? colors.grass : colors.coralDark, fontWeight: '700' }]}>
-                {formatWhen(occ!)}
-              </Text>
+              <View style={{ flexDirection: 'row', gap: space.md, alignItems: 'center' }}>
+                <JamThumb jam={event} size={64} />
+                <Text style={[type.small, { flex: 1, color: occ!.happeningNow ? colors.grass : colors.coralDark, fontWeight: '700' }]}>
+                  {formatWhen(occ!)}
+                </Text>
+              </View>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
                 <Text style={[type.h2, { flexShrink: 1 }]}>{event.name}</Text>
                 {event.music && event.music !== 'none' && (

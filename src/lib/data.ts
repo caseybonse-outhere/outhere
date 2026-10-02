@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import type { JamEvent, JamMember, Line, Review, Session, Spot, Thread } from './types';
+import type { JamEvent, JamMember, Line, Photo, Review, Session, Spot, Thread } from './types';
 
 export async function fetchSpots(): Promise<Spot[]> {
   const { data, error } = await supabase.from('spots').select('*').order('name');
@@ -38,7 +38,7 @@ export async function fetchReviews(spotId: string): Promise<Review[]> {
   return (data ?? []) as Review[];
 }
 
-export async function report(reporterId: string, targetType: 'spot' | 'review' | 'event' | 'session' | 'profile', targetId: string) {
+export async function report(reporterId: string, targetType: 'spot' | 'review' | 'event' | 'session' | 'profile' | 'photo' | 'message', targetId: string) {
   return supabase.from('reports').insert({ reporter_id: reporterId, target_type: targetType, target_id: targetId });
 }
 
@@ -79,4 +79,12 @@ export async function fetchJamMembers(eventId: string): Promise<JamMember[]> {
 export async function fetchMyJamIds(userId: string): Promise<Set<string>> {
   const { data } = await supabase.from('jam_members').select('event_id').eq('user_id', userId);
   return new Set((data ?? []).map((r: { event_id: string }) => r.event_id));
+}
+
+export async function fetchPhotos(userId: string, limit?: number): Promise<{ photos: Photo[]; total: number }> {
+  let q = supabase.from('photos').select('*', { count: 'exact' }).eq('user_id', userId).order('created_at', { ascending: false });
+  if (limit) q = q.limit(limit);
+  const { data, error, count } = await q;
+  if (error) throw error;
+  return { photos: (data ?? []) as Photo[], total: count ?? (data ?? []).length };
 }
