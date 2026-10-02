@@ -4,7 +4,7 @@ Invite-only map of movement-arts spots, weekly jams, and who's out right now —
 
 **Stack:** Expo (React Native, SDK 57) + Expo Router · Supabase (database, email sign-in, edge function) · Expo push notifications.
 
-## What's in v0.2
+## What's in v0.3
 
 | Feature | Where |
 |---|---|
@@ -15,6 +15,9 @@ Invite-only map of movement-arts spots, weekly jams, and who's out right now —
 | **Invite-only** — email code sign-in, then an invite code; each member gets 3 codes | `src/app/sign-in.tsx`, `src/app/invite.tsx` |
 | **Profiles** — photo, bio, what you do, what you're into; tap anyone checked in or reviewing to see theirs | `src/app/(tabs)/me.tsx`, `src/app/profile/[id].tsx` |
 | **Music at jams** — DJ / live / speaker badge, filter jams by DJ or any music, edit jams | `src/app/(tabs)/jams.tsx`, `src/app/event/new.tsx` |
+| **The line is up** — on slackline spots and jams, post what's rigged (type, length, until when); pin turns green | `src/lib/lines.tsx` |
+| **Direct messages** — Messages tab with unread badge, live chat, Message button on profiles; blocks respected | `src/app/(tabs)/messages.tsx`, `src/app/messages/[id].tsx` |
+| **Jam communities** — jam page with Join / Leave, members and organizer, My jams filter | `src/app/jam/[id].tsx` |
 | **App Store basics** — report, block, delete account | spot screen, profile screen, Me tab |
 
 Privacy: the app stores each member's area rounded to ~1 km, never their exact location, and other members can't read it.
@@ -35,7 +38,7 @@ npm install
 ### 2. Supabase (free tier)
 
 1. Create a project at [supabase.com](https://supabase.com).
-2. **SQL Editor → New query**: paste and run, one at a time and in this order: `supabase/migrations/0001_init.sql`, `supabase/seed.sql`, `supabase/migrations/0002_profiles_music.sql`.
+2. **SQL Editor → New query**: paste and run, one at a time and in this order: `supabase/migrations/0001_init.sql`, `supabase/seed.sql`, `supabase/migrations/0002_profiles_music.sql`, `supabase/migrations/0003_lines_messages_jam_members.sql`.
 3. **Authentication → Emails → Templates → Magic Link**: make sure the email includes the code, e.g. add
    `<p>Your Out Here code: <strong>{{ .Token }}</strong></p>`. (The app signs in with the code, not the link.)
 4. **Project Settings → API**: copy the Project URL and the `anon` public key.
@@ -64,12 +67,14 @@ npx supabase secrets set WEBHOOK_SECRET=<any-long-random-string>
 npx supabase functions deploy notify-nearby --no-verify-jwt
 ```
 
-Then in the Supabase dashboard → **Database → Webhooks**, create two webhooks:
+Then in the Supabase dashboard → **Database → Webhooks**, create these webhooks:
 
 | Name | Table | Events | Type | Function | HTTP header |
 |---|---|---|---|---|---|
 | jam-alerts | `events` | Insert | Supabase Edge Function | `notify-nearby` | `x-webhook-secret: <same string>` |
 | session-alerts | `sessions` | Insert | Supabase Edge Function | `notify-nearby` | `x-webhook-secret: <same string>` |
+| line-alerts | `lines` | Insert | Supabase Edge Function | `notify-nearby` | `x-webhook-secret: <same string>` |
+| message-alerts | `messages` | Insert | Supabase Edge Function | `notify-nearby` | `x-webhook-secret: <same string>` |
 
 Push in Expo Go can be limited; alerts are fully reliable in a TestFlight build (step 5).
 

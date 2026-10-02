@@ -1,4 +1,4 @@
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, ScrollView, Text, View } from 'react-native';
 import { useAuth } from '../../lib/auth';
@@ -78,6 +78,7 @@ export default function ProfileScreen() {
 
         {!isMe && me && (
           <View style={{ gap: space.sm }}>
+            <Button title={`Message ${person.display_name}`} onPress={() => router.push(`/messages/${person.id}`)} />
             <Button
               title="Report"
               variant="ghost"

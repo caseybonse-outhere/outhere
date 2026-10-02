@@ -3,10 +3,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker, type Region } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { fetchActiveSessions, fetchSpots } from '../../lib/data';
+import { fetchActiveLines, fetchActiveSessions, fetchSpots } from '../../lib/data';
 import { getApproxLocation } from '../../lib/device';
 import { colors, radius, space } from '../../lib/theme';
-import { DISCIPLINES, type Session, type Spot } from '../../lib/types';
+import { DISCIPLINES, type Line, type Session, type Spot } from '../../lib/types';
 import { Chip } from '../../lib/ui';
 
 // Santa Monica, until we know where the member is.
@@ -17,12 +17,14 @@ export default function MapScreen() {
   const mapRef = useRef<MapView>(null);
   const [spots, setSpots] = useState<Spot[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
+  const [lines, setLines] = useState<Line[]>([]);
   const [filter, setFilter] = useState<string | null>(null);
 
   useFocusEffect(
     useCallback(() => {
       fetchSpots().then(setSpots).catch(() => {});
       fetchActiveSessions().then(setSessions).catch(() => {});
+      fetchActiveLines().then(setLines).catch(() => {});
     }, []),
   );
 
@@ -40,6 +42,8 @@ export default function MapScreen() {
     return m;
   }, [sessions]);
 
+  const linesUp = useMemo(() => new Set(lines.map((l) => l.spot_id)), [lines]);
+
   const visible = filter ? spots.filter((s) => s.disciplines.includes(filter)) : spots;
 
   return (
@@ -56,13 +60,17 @@ export default function MapScreen() {
       >
         {visible.map((spot) => {
           const live = liveCount.get(spot.id) ?? 0;
+          const lineUp = linesUp.has(spot.id);
+          const description = [lineUp ? 'The line is up' : null, live > 0 ? `${live} out here now` : null]
+            .filter(Boolean)
+            .join(' · ');
           return (
             <Marker
-              key={spot.id}
+              key={`${spot.id}-${lineUp ? 'l' : ''}${live > 0 ? 'p' : ''}`}
               coordinate={{ latitude: spot.lat, longitude: spot.lng }}
-              pinColor={live > 0 ? colors.gold : colors.coral}
+              pinColor={lineUp ? colors.grass : live > 0 ? colors.gold : colors.coral}
               title={spot.name}
-              description={live > 0 ? `${live} out here now · tap for details` : spot.disciplines.join(' · ')}
+              description={description ? `${description} · tap for details` : spot.disciplines.join(' · ')}
               onCalloutPress={() => router.push(`/spot/${spot.id}`)}
             />
           );
@@ -88,6 +96,13 @@ export default function MapScreen() {
             <View style={styles.dot} />
             <Text style={styles.liveText}>
               {sessions.length} {sessions.length === 1 ? 'person' : 'people'} out here now
+            </Text>
+          </Pressable>
+        )}
+        {lines.length > 0 && (
+          <Pressable accessibilityRole="button" style={[styles.livePill, { backgroundColor: colors.grass }]} onPress={() => router.push(`/spot/${lines[0].spot_id}`)}>
+            <Text style={styles.liveText}>
+              {lines.length === 1 ? 'A line is up' : `${lines.length} lines are up`}
             </Text>
           </Pressable>
         )}

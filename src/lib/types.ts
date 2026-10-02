@@ -87,7 +87,9 @@ export type JamEvent = {
   music: Music | null;
   created_by: string | null;
   created_at: string;
-  spot?: Pick<Spot, 'id' | 'name' | 'lat' | 'lng' | 'address'>;
+  spot?: Pick<Spot, 'id' | 'name' | 'lat' | 'lng' | 'address' | 'disciplines'>;
+  /** Member count, embedded by fetchEvents. */
+  jam_members?: { count: number }[];
 };
 
 export type Session = {
@@ -122,3 +124,55 @@ export type Invite = {
 /** What any member can see about another member. */
 export type PublicProfile = Pick<Profile, 'id' | 'display_name' | 'disciplines' | 'interests' | 'bio' | 'avatar_url' | 'created_at'>;
 export const PUBLIC_PROFILE_COLUMNS = 'id, display_name, disciplines, interests, bio, avatar_url, created_at';
+
+export type LineType = 'slackline' | 'trickline' | 'longline' | 'highline' | 'waterline' | 'rodeo';
+export const LINE_TYPE_LABEL: Record<LineType, string> = {
+  slackline: 'Slackline',
+  trickline: 'Trickline',
+  longline: 'Longline',
+  highline: 'Highline',
+  waterline: 'Waterline',
+  rodeo: 'Rodeo line',
+};
+
+export type Line = {
+  id: string;
+  spot_id: string;
+  user_id: string;
+  line_type: LineType;
+  length_ft: number | null;
+  note: string | null;
+  up_until: string;
+  created_at: string;
+  profile?: Pick<Profile, 'display_name' | 'avatar_url'>;
+};
+
+export type Message = {
+  id: string;
+  sender_id: string;
+  recipient_id: string;
+  body: string;
+  created_at: string;
+  read_at: string | null;
+};
+
+export type Thread = {
+  other_id: string;
+  display_name: string;
+  avatar_url: string | null;
+  last_body: string;
+  last_at: string;
+  last_from_me: boolean;
+  unread: number;
+};
+
+export type JamMember = {
+  event_id: string;
+  user_id: string;
+  role: 'member' | 'organizer';
+  joined_at: string;
+  profile?: Pick<Profile, 'display_name' | 'avatar_url'>;
+};
+
+/** Slackline is the discipline that unlocks "the line is up". */
+export const SLACKLINE = 'Slackline';

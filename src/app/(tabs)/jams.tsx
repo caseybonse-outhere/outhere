@@ -4,21 +4,24 @@ import { useCallback, useMemo, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
 import { useAuth } from '../../lib/auth';
 import { addJamToCalendar } from '../../lib/calendar';
-import { fetchEvents } from '../../lib/data';
+import { fetchActiveLines, fetchEvents, fetchMyJamIds } from '../../lib/data';
+import { LineUpBadge } from '../../lib/lines';
 import { describeSchedule, formatWhen, nextOccurrence } from '../../lib/schedule';
 import { colors, radius, space, type } from '../../lib/theme';
-import { MUSIC_LABEL, type JamEvent } from '../../lib/types';
+import { MUSIC_LABEL, SLACKLINE, type JamEvent } from '../../lib/types';
 import { Button, Card, Chip, Empty, Screen, Segmented } from '../../lib/ui';
 
-type MusicFilter = 'all' | 'dj' | 'music';
+type JamFilter = 'all' | 'mine' | 'dj' | 'music';
 
-const FILTERS: { label: string; value: MusicFilter }[] = [
+const FILTERS: { label: string; value: JamFilter }[] = [
   { label: 'All jams', value: 'all' },
+  { label: 'My jams', value: 'mine' },
   { label: 'DJ', value: 'dj' },
   { label: 'Any music', value: 'music' },
 ];
 
-function matches(e: JamEvent, f: MusicFilter) {
+function matches(e: JamEvent, f: JamFilter, mine: Set<string>) {
+  if (f === 'mine') return mine.has(e.id);
   if (f === 'dj') return e.music === 'dj';
   if (f === 'music') return e.music === 'dj' || e.music === 'live' || e.music === 'speaker';
   return true;
@@ -28,17 +31,26 @@ export default function Jams() {
   const { profile } = useAuth();
   const [events, setEvents] = useState<JamEvent[]>([]);
   const [refreshing, setRefreshing] = useState(false);
-  const [filter, setFilter] = useState<MusicFilter>('all');
+  const [filter, setFilter] = useState<JamFilter>('all');
+  const [myJams, setMyJams] = useState<Set<string>>(new Set());
+  const [lineSpots, setLineSpots] = useState<Set<string>>(new Set());
 
   const load = useCallback(async () => {
     setRefreshing(true);
     try {
-      setEvents(await fetchEvents());
+      const [e, mine, lines] = await Promise.all([
+        fetchEvents(),
+        profile ? fetchMyJamIds(profile.id) : Promise.resolve(new Set<string>()),
+        fetchActiveLines().catch(() => []),
+      ]);
+      setEvents(e);
+      setMyJams(mine);
+      setLineSpots(new Set(lines.map((l) => l.spot_id)));
     } catch {
       // keep what we had
     }
     setRefreshing(false);
-  }, []);
+  }, [profile?.id]);
 
   useFocusEffect(
     useCallback(() => {
@@ -49,11 +61,11 @@ export default function Jams() {
   const upcoming = useMemo(
     () =>
       events
-        .filter((e) => matches(e, filter))
+        .filter((e) => matches(e, filter, myJams))
         .map((e) => ({ event: e, occ: nextOccurrence(e, e.spot!.lat, e.spot!.lng) }))
         .filter((x) => x.occ)
         .sort((a, b) => a.occ!.start.getTime() - b.occ!.start.getTime()),
-    [events, filter],
+    [events, filter, myJams],
   );
 
   return (
@@ -78,12 +90,14 @@ export default function Jams() {
             text={
               filter === 'all'
                 ? 'No jams yet. Add your weekly session so people can find it.'
-                : 'No jams with that kind of music yet. Organizers can add music info with Edit on a jam.'
+                : filter === 'mine'
+                  ? 'You haven’t joined any jams yet. Open a jam and tap Join this jam.'
+                  : 'No jams with that kind of music yet. Organizers can add music info with Edit on a jam.'
             }
           />
         }
         renderItem={({ item: { event, occ } }) => (
-          <Pressable accessibilityRole="button" onPress={() => router.push(`/spot/${event.spot_id}`)}>
+          <Pressable accessibilityRole="button" onPress={() => router.push(`/jam/${event.id}`)}>
             <Card>
               <Text style={[type.small, { color: occ!.happeningNow ? colors.grass : colors.coralDark, fontWeight: '700' }]}>
                 {formatWhen(occ!)}
@@ -112,6 +126,14 @@ export default function Jams() {
               <Text style={type.small}>
                 {event.spot?.name} · {describeSchedule(event)}
               </Text>
+              <Text style={[type.small, { fontWeight: '700' }]}>
+                {(() => {
+                  const n = event.jam_members?.[0]?.count ?? 0;
+                  return `${n} ${n === 1 ? 'member' : 'members'}${myJams.has(event.id) ? ' · You’re in' : ''}`;
+                })()}
+              </Text>
+              {lineSpots.has(event.spot_id) &&
+                (event.disciplines.includes(SLACKLINE) || (event.spot?.disciplines ?? []).includes(SLACKLINE)) && <LineUpBadge />}
               {event.disciplines.length > 0 && (
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.xs }}>
                   {event.disciplines.map((d) => (

@@ -4,11 +4,12 @@ import { Alert, Linking, Pressable, ScrollView, Text, View } from 'react-native'
 import { useAuth } from '../../lib/auth';
 import { Avatar } from '../../lib/avatar';
 import { addJamToCalendar } from '../../lib/calendar';
-import { block, fetchActiveSessions, fetchEvents, fetchReviews, report } from '../../lib/data';
+import { block, fetchActiveLines, fetchActiveSessions, fetchEvents, fetchReviews, report } from '../../lib/data';
+import { LineSection } from '../../lib/lines';
 import { describeSchedule, formatTime, formatWhen, nextOccurrence, sunsetToday } from '../../lib/schedule';
 import { supabase } from '../../lib/supabase';
 import { colors, space, type } from '../../lib/theme';
-import { MUSIC_LABEL, type JamEvent, type Review, type Session, type Spot } from '../../lib/types';
+import { MUSIC_LABEL, SLACKLINE, type JamEvent, type Line, type Review, type Session, type Spot } from '../../lib/types';
 import { Button, Card, Chip, Empty, Field, Screen, Segmented } from '../../lib/ui';
 
 const FIRE_LABEL = { yes: 'Fire OK', no: 'No fire', permit: 'Fire with permit', unknown: 'Fire rules unknown' };
@@ -23,6 +24,7 @@ export default function SpotScreen() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [events, setEvents] = useState<JamEvent[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [lines, setLines] = useState<Line[]>([]);
   const [checkingIn, setCheckingIn] = useState(false);
   const [activity, setActivity] = useState<string | null>(null);
   const [until, setUntil] = useState<Until>('2h');
@@ -32,10 +34,16 @@ export default function SpotScreen() {
   const load = useCallback(async () => {
     const { data } = await supabase.from('spots').select('*').eq('id', id).maybeSingle();
     setSpot(data as Spot | null);
-    const [s, e, r] = await Promise.all([fetchActiveSessions(id), fetchEvents(id), fetchReviews(id)]);
+    const [s, e, r, l] = await Promise.all([
+      fetchActiveSessions(id),
+      fetchEvents(id),
+      fetchReviews(id),
+      fetchActiveLines(id).catch(() => [] as Line[]),
+    ]);
     setSessions(s);
     setEvents(e);
     setReviews(r);
+    setLines(l);
     const mine = r.find((x) => x.user_id === profile?.id);
     if (mine) {
       setRating(mine.rating);
@@ -60,6 +68,8 @@ export default function SpotScreen() {
     );
   }
   const s = spot;
+  // "The line is up" applies when the spot or any jam here is a slackline thing.
+  const slackliney = s.disciplines.includes(SLACKLINE) || events.some((e) => e.disciplines.includes(SLACKLINE)) || lines.length > 0;
 
   async function checkIn() {
     const now = new Date();
@@ -113,6 +123,8 @@ export default function SpotScreen() {
           </View>
         </View>
         <Button title="Directions" variant="secondary" onPress={() => Linking.openURL(`https://maps.apple.com/?daddr=${s.lat},${s.lng}`)} />
+
+        {slackliney && <LineSection spot={s} lines={lines} userId={profile.id} onChange={load} />}
 
         {/* Out here now */}
         <Card>
@@ -168,7 +180,9 @@ export default function SpotScreen() {
             const occ = nextOccurrence(e, s.lat, s.lng);
             return (
               <View key={e.id} style={{ gap: 2, paddingVertical: space.xs }}>
-                <Text style={[type.body, { fontWeight: '700' }]}>{e.name}</Text>
+                <Pressable accessibilityRole="button" onPress={() => router.push(`/jam/${e.id}`)} style={{ minHeight: 32, justifyContent: 'center' }}>
+                  <Text style={[type.body, { fontWeight: '700', color: colors.coralDark }]}>{e.name} ›</Text>
+                </Pressable>
                 <Text style={type.small}>
                   {describeSchedule(e)}
                   {e.music && e.music !== 'none' ? ` · ${MUSIC_LABEL[e.music]}` : ''}

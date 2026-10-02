@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import type { JamEvent, Review, Session, Spot } from './types';
+import type { JamEvent, JamMember, Line, Review, Session, Spot, Thread } from './types';
 
 export async function fetchSpots(): Promise<Spot[]> {
   const { data, error } = await supabase.from('spots').select('*').order('name');
@@ -21,7 +21,7 @@ export async function fetchActiveSessions(spotId?: string): Promise<Session[]> {
 }
 
 export async function fetchEvents(spotId?: string): Promise<JamEvent[]> {
-  let q = supabase.from('events').select('*, spot:spots(id, name, lat, lng, address)');
+  let q = supabase.from('events').select('*, spot:spots(id, name, lat, lng, address, disciplines), jam_members(count)');
   if (spotId) q = q.eq('spot_id', spotId);
   const { data, error } = await q;
   if (error) throw error;
@@ -44,4 +44,39 @@ export async function report(reporterId: string, targetType: 'spot' | 'review' |
 
 export async function block(blockerId: string, blockedId: string) {
   return supabase.from('blocks').insert({ blocker_id: blockerId, blocked_id: blockedId });
+}
+
+export async function fetchActiveLines(spotId?: string): Promise<Line[]> {
+  let q = supabase
+    .from('lines')
+    .select('*, profile:profiles(display_name, avatar_url)')
+    .gt('up_until', new Date().toISOString())
+    .order('created_at', { ascending: false });
+  if (spotId) q = q.eq('spot_id', spotId);
+  const { data, error } = await q;
+  if (error) throw error;
+  return (data ?? []) as Line[];
+}
+
+export async function fetchThreads(): Promise<Thread[]> {
+  const { data, error } = await supabase.rpc('my_threads');
+  if (error) throw error;
+  return (data ?? []) as Thread[];
+}
+
+export async function fetchJamMembers(eventId: string): Promise<JamMember[]> {
+  const { data, error } = await supabase
+    .from('jam_members')
+    .select('*, profile:profiles(display_name, avatar_url)')
+    .eq('event_id', eventId)
+    .order('role', { ascending: false })
+    .order('joined_at');
+  if (error) throw error;
+  return (data ?? []) as JamMember[];
+}
+
+/** Event ids of the jams the current member belongs to. */
+export async function fetchMyJamIds(userId: string): Promise<Set<string>> {
+  const { data } = await supabase.from('jam_members').select('event_id').eq('user_id', userId);
+  return new Set((data ?? []).map((r: { event_id: string }) => r.event_id));
 }
