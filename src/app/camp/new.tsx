@@ -30,7 +30,7 @@ function nextDateFor(dow: number): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-export default function NewJam() {
+export default function NewCamp() {
   // With ?id=… this screen edits an existing jam; otherwise it adds a new one.
   const params = useLocalSearchParams<{ spotId?: string; id?: string }>();
   const editingId = params.id;
@@ -89,7 +89,7 @@ export default function NewJam() {
   const valid = name.trim() && spotId && (startType === 'sunset' || parsed);
 
   async function changeCover() {
-    const source = await chooseSource('Jam photo');
+    const source = await chooseSource('Camp photo');
     if (!source) return;
     try {
       setUploading(true);
@@ -128,27 +128,27 @@ export default function NewJam() {
       ? await supabase.from('events').update(fields).eq('id', editingId).select('id')
       : await supabase.from('events').insert(fields).select('id');
     setBusy(false);
-    if (error) return Alert.alert('Couldn’t save jam', error.message);
+    if (error) return Alert.alert('Couldn’t save camp', error.message);
     const saved = (data ?? [])[0] as { id: string } | undefined;
-    if (!saved) return Alert.alert('Couldn’t save jam', 'Only the organizer can edit this jam.');
+    if (!saved) return Alert.alert('Couldn’t save camp', 'Only the organizer can edit this camp.');
 
     emitJamsChanged();
     if (editingId) router.back();
-    else router.replace(`/jam/${saved.id}`); // show the new jam right away
+    else router.replace(`/camp/${saved.id}`); // show the new jam right away
   }
 
   return (
     <Screen>
-      <Stack.Screen options={{ title: editingId ? 'Edit jam' : 'Add a jam' }} />
+      <Stack.Screen options={{ title: editingId ? 'Edit camp' : 'Start a camp' }} />
       <ScrollView contentContainerStyle={{ padding: space.lg, gap: space.lg, paddingBottom: space.xxl * 2 }} keyboardShouldPersistTaps="handled">
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.lg }}>
           {coverUrl ? (
-            <Image source={{ uri: coverUrl }} accessibilityLabel="Jam photo" style={{ width: 96, height: 96, borderRadius: radius.md, backgroundColor: colors.sand2 }} />
+            <Image source={{ uri: coverUrl }} accessibilityLabel="Camp photo" style={{ width: 96, height: 96, borderRadius: radius.md, backgroundColor: colors.sand2 }} />
           ) : (
             <View style={{ width: 96, height: 96, borderRadius: radius.md, backgroundColor: colors.sand2, borderWidth: 1, borderColor: colors.line, borderStyle: 'dashed' }} />
           )}
           <View style={{ flex: 1, gap: space.xs }}>
-            <Text style={type.label}>Jam photo</Text>
+            <Text style={type.label}>Camp photo</Text>
             <Button title={uploading ? 'Uploading…' : coverUrl ? 'Change photo' : 'Add photo'} variant="ghost" onPress={changeCover} disabled={uploading} />
             {coverUrl && !uploading && <Button title="Remove" variant="ghost" onPress={() => setCoverUrl(null)} />}
           </View>
@@ -220,13 +220,13 @@ export default function NewJam() {
         <Field label="Organizer (optional)" value={organizer} onChangeText={setOrganizer} />
         <Field label="Description (optional)" value={description} onChangeText={setDescription} multiline placeholder="What to bring, skill level, vibe…" />
 
-        <Button title="Save jam" onPress={save} loading={busy} disabled={!valid} />
+        <Button title={editingId ? 'Save camp' : 'Start camp'} onPress={save} loading={busy} disabled={!valid} />
         {editingId && existing?.created_by === profile?.id && (
           <Button
-            title="Delete jam"
+            title="Delete camp"
             variant="danger"
             onPress={() =>
-              Alert.alert('Delete this jam?', 'It will disappear for everyone.', [
+              Alert.alert('Delete this camp?', 'It will disappear for everyone.', [
                 { text: 'Cancel', style: 'cancel' },
                 {
                   text: 'Delete',
@@ -235,7 +235,7 @@ export default function NewJam() {
                     const { error } = await supabase.from('events').delete().eq('id', editingId);
                     if (error) return Alert.alert('Couldn’t delete', error.message);
                     emitJamsChanged();
-                    router.dismissTo('/jams');
+                    router.dismissTo('/camps');
                   },
                 },
               ])

@@ -177,13 +177,13 @@ export default function SpotScreen() {
 
         {/* Jams */}
         <Card>
-          <Text style={type.h2}>Jams here</Text>
-          {events.length === 0 && <Empty text="No regular jams yet." />}
+          <Text style={type.h2}>Camps here</Text>
+          {events.length === 0 && <Empty text="No camps here yet." />}
           {events.map((e) => {
             const occ = nextOccurrence(e, s.lat, s.lng);
             return (
               <View key={e.id} style={{ gap: 2, paddingVertical: space.xs }}>
-                <Pressable accessibilityRole="button" onPress={() => router.push(`/jam/${e.id}`)} style={{ minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: space.md }}>
+                <Pressable accessibilityRole="button" onPress={() => router.push(`/camp/${e.id}`)} style={{ minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: space.md }}>
                   <JamThumb jam={e} size={44} />
                   <Text style={[type.body, { flex: 1, fontWeight: '700', color: colors.coralDark }]}>{e.name} ›</Text>
                 </Pressable>
@@ -200,7 +200,7 @@ export default function SpotScreen() {
               </View>
             );
           })}
-          <Button title="Add a jam here" variant="ghost" onPress={() => router.push({ pathname: '/event/new', params: { spotId: s.id } })} />
+          <Button title="Start a camp here" variant="ghost" onPress={() => router.push({ pathname: '/camp/new', params: { spotId: s.id } })} />
         </Card>
 
         {/* Details */}

@@ -89,9 +89,9 @@ export default function RootLayout() {
         <Stack.Screen name="invite" options={{ title: 'Your invite', headerBackVisible: false }} />
         <Stack.Screen name="spot/[id]" options={{ title: '' }} />
         <Stack.Screen name="spot/new" options={{ title: 'Add a spot', presentation: 'modal' }} />
-        <Stack.Screen name="event/new" options={{ title: 'Jam', presentation: 'modal' }} />
+        <Stack.Screen name="camp/new" options={{ title: 'Camp', presentation: 'modal' }} />
         <Stack.Screen name="profile/[id]" options={{ title: '' }} />
-        <Stack.Screen name="jam/[id]" options={{ title: '' }} />
+        <Stack.Screen name="camp/[id]" options={{ title: '' }} />
       </Stack>
       <Gate />
     </AuthProvider>

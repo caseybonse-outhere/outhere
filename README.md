@@ -4,12 +4,12 @@ Invite-only map of movement-arts spots, weekly jams, and who's out right now —
 
 **Stack:** Expo (React Native, SDK 57) + Expo Router · Supabase (database, email sign-in, edge function) · Expo push notifications.
 
-## What's in v0.5
+## What’s in v0.7
 
 | Feature | Where |
 |---|---|
 | **Spots** — map with discipline filters, long-press to add, public/private, fire/lighting/surface, −5…+5 reviews | `src/app/(tabs)/index.tsx`, `src/app/spot/` |
-| **Recurring jams** — weekly / every other week / one-off, fixed time or *at sunset* (computed per date), "Add to calendar" with a repeating event | `src/app/(tabs)/jams.tsx`, `src/app/event/new.tsx`, `src/lib/schedule.ts` |
+| **Recurring camps** — weekly / every other week / one-off, fixed time or *at sunset* (computed per date), "Add to calendar" with a repeating event | `src/app/(tabs)/jams.tsx`, `src/app/event/new.tsx`, `src/lib/schedule.ts` |
 | **"I'm out here" sessions** — check in at a spot until 1–3 h or sunset; auto-expires | `src/app/spot/[id].tsx` |
 | **Nearby alerts** — members pick a radius (1–50 mi); new jams and check-ins push to everyone in range | `src/app/(tabs)/me.tsx`, `supabase/functions/notify-nearby` |
 | **Invite-only** — email code sign-in, then an invite code; each member gets 3 codes | `src/app/sign-in.tsx`, `src/app/invite.tsx` |

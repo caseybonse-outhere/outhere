@@ -125,7 +125,7 @@ export default function Me() {
         <Card>
           <Text style={type.h2}>Nearby alerts</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.md }}>
-            <Text style={[type.body, { flex: 1 }]}>Tell me about new jams and people out here</Text>
+            <Text style={[type.body, { flex: 1 }]}>Tell me about new camps and people out here</Text>
             <Switch
               value={profile.alerts_enabled}
               onValueChange={(v) => update({ alerts_enabled: v })}
@@ -158,7 +158,7 @@ export default function Me() {
         {/* Invites */}
         <Card>
           <Text style={type.h2}>Your invites</Text>
-          <Text style={type.small}>OUTHERENOW grows by word of mouth. Share a code with someone you’d want to jam with.</Text>
+          <Text style={type.small}>OUTHERENOW grows by word of mouth. Share a code with someone you’d want to camp with.</Text>
           {invites.map((i) => (
             <View key={i.code} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 44 }}>
               <Text style={[type.body, { fontWeight: '800', letterSpacing: 1, opacity: i.used_by ? 0.4 : 1 }]}>{i.code}</Text>

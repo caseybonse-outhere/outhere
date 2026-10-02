@@ -15,7 +15,7 @@ import { colors, radius, space, type } from '../../lib/theme';
 import { MUSIC_LABEL, SLACKLINE, type JamEvent, type JamMember, type Line } from '../../lib/types';
 import { Button, Card, Chip, Empty, Screen } from '../../lib/ui';
 
-export default function JamScreen() {
+export default function CampScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { profile } = useAuth();
   const { width } = useWindowDimensions();
@@ -50,7 +50,7 @@ export default function JamScreen() {
   if (!jam || !jam.spot || !profile) {
     return (
       <Screen style={{ padding: space.xl }}>
-        <Empty text={loaded ? 'This jam isn’t around anymore.' : 'Loading…'} />
+        <Empty text={loaded ? 'This camp isn’t around anymore.' : 'Loading…'} />
       </Screen>
     );
   }
@@ -71,7 +71,7 @@ export default function JamScreen() {
 
   function leave() {
     if (me?.role === 'organizer') {
-      return Alert.alert('You organize this jam', 'Organizers stay in the community. To stop running it, delete the jam from Edit.');
+      return Alert.alert('You organize this camp', 'Organizers stay in the community. To stop running it, delete the camp from Edit.');
     }
     Alert.alert(`Leave ${jam!.name}?`, undefined, [
       { text: 'Cancel', style: 'cancel' },
@@ -139,14 +139,14 @@ export default function JamScreen() {
           <Text style={type.small}>
             {me
               ? me.role === 'organizer'
-                ? 'You organize this jam.'
-                : 'You’re part of this jam.'
+                ? 'You organize this camp.'
+                : 'You’re part of this camp.'
               : 'Join to show you’re a regular and find the crew.'}
           </Text>
           {me ? (
-            me.role !== 'organizer' && <Button title="Leave jam" variant="ghost" onPress={leave} />
+            me.role !== 'organizer' && <Button title="Leave camp" variant="ghost" onPress={leave} />
           ) : (
-            <Button title="Join this jam" onPress={join} loading={busy} />
+            <Button title="Join this camp" onPress={join} loading={busy} />
           )}
           {members.map((m) => (
             <Pressable
@@ -171,7 +171,7 @@ export default function JamScreen() {
         {/* Actions */}
         <View style={{ gap: space.sm }}>
           {occ && <Button title="Add to calendar" variant="secondary" onPress={() => addJamToCalendar(jam, occ)} />}
-          {canEdit && <Button title="Edit jam" variant="ghost" onPress={() => router.push({ pathname: '/event/new', params: { id: jam.id } })} />}
+          {canEdit && <Button title="Edit camp" variant="ghost" onPress={() => router.push({ pathname: '/camp/new', params: { id: jam.id } })} />}
         </View>
       </ScrollView>
     </Screen>

@@ -16,8 +16,8 @@ import { Button, Card, Chip, Empty, Screen, Segmented } from '../../lib/ui';
 type JamFilter = 'all' | 'mine' | 'dj' | 'music';
 
 const FILTERS: { label: string; value: JamFilter }[] = [
-  { label: 'All jams', value: 'all' },
-  { label: 'My jams', value: 'mine' },
+  { label: 'All camps', value: 'all' },
+  { label: 'My camps', value: 'mine' },
   { label: 'DJ', value: 'dj' },
   { label: 'Any music', value: 'music' },
 ];
@@ -29,7 +29,7 @@ function matches(e: JamEvent, f: JamFilter, mine: Set<string>) {
   return true;
 }
 
-export default function Jams() {
+export default function Camps() {
   const { profile } = useAuth();
   const [events, setEvents] = useState<JamEvent[]>([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -78,8 +78,8 @@ export default function Jams() {
       <Stack.Screen
         options={{
           headerRight: () => (
-            <Pressable accessibilityRole="button" onPress={() => router.push('/event/new')} style={{ paddingHorizontal: space.lg, minHeight: 44, justifyContent: 'center' }}>
-              <Text style={{ color: colors.coralDark, fontWeight: '800', fontSize: 16 }}>+ Add jam</Text>
+            <Pressable accessibilityRole="button" onPress={() => router.push('/camp/new')} style={{ paddingHorizontal: space.lg, minHeight: 44, justifyContent: 'center' }}>
+              <Text style={{ color: colors.coralDark, fontWeight: '800', fontSize: 16 }}>+ Start camp</Text>
             </Pressable>
           ),
         }}
@@ -94,7 +94,7 @@ export default function Jams() {
             <Segmented options={FILTERS} value={filter} onChange={setFilter} />
             {loadError && (
               <Card style={{ borderColor: colors.coralDark }}>
-                <Text style={[type.body, { fontWeight: '700' }]}>Couldn’t load jams</Text>
+                <Text style={[type.body, { fontWeight: '700' }]}>Couldn’t load camps</Text>
                 <Text style={type.small}>{loadError}</Text>
                 <Button title="Try again" variant="ghost" onPress={load} />
               </Card>
@@ -105,15 +105,15 @@ export default function Jams() {
           <Empty
             text={
               filter === 'all'
-                ? 'No jams yet. Add your weekly session so people can find it.'
+                ? 'No camps yet. Start one for your weekly session so people can find it.'
                 : filter === 'mine'
-                  ? 'You haven’t joined any jams yet. Open a jam and tap Join this jam.'
-                  : 'No jams with that kind of music yet. Organizers can add music info with Edit on a jam.'
+                  ? 'You haven’t joined any camps yet. Open a camp and tap Join this camp.'
+                  : 'No camps with that kind of music yet. Organizers can add music info with Edit on a camp.'
             }
           />
         }
         renderItem={({ item: { event, occ } }) => (
-          <Pressable accessibilityRole="button" onPress={() => router.push(`/jam/${event.id}`)}>
+          <Pressable accessibilityRole="button" onPress={() => router.push(`/camp/${event.id}`)}>
             <Card>
               <View style={{ flexDirection: 'row', gap: space.md, alignItems: 'center' }}>
                 <JamThumb jam={event} size={64} />
@@ -164,7 +164,7 @@ export default function Jams() {
                 <Button title="Add to calendar" variant="ghost" onPress={() => addJamToCalendar(event, occ!)} />
                 {/* Organizers edit their own jams; unclaimed (seeded) jams can be claimed by the first member who edits them. */}
                 {(event.created_by === profile?.id || event.created_by == null) && (
-                  <Button title="Edit" variant="ghost" onPress={() => router.push({ pathname: '/event/new', params: { id: event.id } })} />
+                  <Button title="Edit" variant="ghost" onPress={() => router.push({ pathname: '/camp/new', params: { id: event.id } })} />
                 )}
               </View>
             </Card>

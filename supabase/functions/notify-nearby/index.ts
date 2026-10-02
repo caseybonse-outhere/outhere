@@ -52,7 +52,7 @@ async function notifyNearby(table: Table, rec: Record<string, unknown>) {
   let title: string;
   let body: string;
   if (table === 'events') {
-    title = `New jam: ${rec.name}`;
+    title = `New camp: ${rec.name}`;
     body = `At ${spot.name}. Tap to see when.`;
   } else if (table === 'lines') {
     const kind = LINE_LABEL[String(rec.line_type)] ?? 'Slackline';

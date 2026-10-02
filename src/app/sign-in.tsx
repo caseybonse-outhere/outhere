@@ -32,7 +32,7 @@ export default function SignIn() {
         <View style={styles.brand}>
           <PinLogo size={88} />
           <Text style={styles.word} numberOfLines={1} adjustsFontSizeToFit accessibilityRole="header">OUTHERENOW</Text>
-          <Text style={[type.small, { textAlign: 'center' }]}>Spots, jams and who’s out right now — flow, slackline, acro, yoga, hiking and more.</Text>
+          <Text style={[type.small, { textAlign: 'center' }]}>Spots, camps and who’s out right now — flow, slackline, acro, yoga, hiking and more.</Text>
         </View>
 
         {!sent ? (

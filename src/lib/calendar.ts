@@ -10,7 +10,7 @@ export async function addJamToCalendar(event: JamEvent, occ: Occurrence) {
     if (status !== 'granted') {
       Alert.alert(
         'Calendar access is off',
-        'To add jams to your calendar, allow calendar access for this app in the iPhone Settings app.',
+        'To add camps to your calendar, allow calendar access for this app in the iPhone Settings app.',
         [
           { text: 'Not now', style: 'cancel' },
           { text: 'Open Settings', onPress: () => Linking.openSettings() },

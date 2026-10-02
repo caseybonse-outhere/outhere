@@ -3,7 +3,7 @@
     "name": "OUTHERENOW",
     "slug": "outhere",
     "scheme": "outhere",
-    "version": "0.6.0",
+    "version": "0.7.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -34,21 +34,21 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "OUTHERENOW uses your approximate location to show spots near you and to send alerts about jams within your chosen radius."
+          "locationWhenInUsePermission": "OUTHERENOW uses your approximate location to show spots near you and to send alerts about camps within your chosen radius."
         }
       ],
       "expo-notifications",
       [
         "expo-calendar",
         {
-          "calendarPermission": "OUTHERENOW adds jams you choose to your calendar."
+          "calendarPermission": "OUTHERENOW adds camps you choose to your calendar."
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "OUTHERENOW uses your photos so you can add a profile picture and jam photos.",
-          "cameraPermission": "OUTHERENOW uses the camera so you can take a profile picture or jam photo.",
+          "photosPermission": "OUTHERENOW uses your photos so you can add a profile picture and camp photos.",
+          "cameraPermission": "OUTHERENOW uses the camera so you can take a profile picture or camp photo.",
           "microphonePermission": false
         }
       ]
