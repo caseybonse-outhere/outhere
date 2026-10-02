@@ -31,8 +31,8 @@ export default function SignIn() {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.wrap}>
         <View style={styles.brand}>
           <PinLogo size={88} />
-          <Text style={styles.word}>out here</Text>
-          <Text style={[type.small, { textAlign: 'center' }]}>Spots, jams and who’s out right now — flow, slackline, acro, parkour.</Text>
+          <Text style={styles.word} numberOfLines={1} adjustsFontSizeToFit accessibilityRole="header">OUTHERENOW</Text>
+          <Text style={[type.small, { textAlign: 'center' }]}>Spots, jams and who’s out right now — flow, slackline, acro, yoga, hiking and more.</Text>
         </View>
 
         {!sent ? (
@@ -65,6 +65,6 @@ export default function SignIn() {
 const styles = StyleSheet.create({
   wrap: { flex: 1, justifyContent: 'center', padding: space.xl, gap: space.xxl },
   brand: { alignItems: 'center', gap: space.sm },
-  word: { fontSize: 44, fontWeight: '800', letterSpacing: -1.5, color: colors.night },
+  word: { fontSize: 40, fontWeight: '800', letterSpacing: -1, color: colors.night, alignSelf: 'stretch', textAlign: 'center' },
   form: { gap: space.lg },
 });

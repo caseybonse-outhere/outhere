@@ -1,4 +1,4 @@
-# Out Here
+# OUTHERENOW
 
 Invite-only map of movement-arts spots, weekly jams, and who's out right now — flow, slackline, acro, parkour.
 
@@ -40,7 +40,7 @@ npm install
 1. Create a project at [supabase.com](https://supabase.com).
 2. **SQL Editor → New query**: paste and run, one at a time and in this order: `supabase/migrations/0001_init.sql`, `supabase/seed.sql`, `supabase/migrations/0002_profiles_music.sql`, `supabase/migrations/0003_lines_messages_jam_members.sql`, `supabase/migrations/0004_photos.sql`, `supabase/migrations/0005_remove_gallery_messages.sql`.
 3. **Authentication → Emails → Templates → Magic Link**: make sure the email includes the code, e.g. add
-   `<p>Your Out Here code: <strong>{{ .Token }}</strong></p>`. (The app signs in with the code, not the link.)
+   `<p>Your OUTHERENOW code: <strong>{{ .Token }}</strong></p>`. (The app signs in with the code, not the link.)
 4. **Project Settings → API**: copy the Project URL and the `anon` public key.
 5. In the project folder: `cp .env.example .env` and paste both values in.
 
@@ -79,7 +79,7 @@ Push in Expo Go can be limited; alerts are fully reliable in a TestFlight build 
 
 ### 5. TestFlight (when you're ready)
 
-Needs the Apple Developer Program ($99/yr). Change `ios.bundleIdentifier` in `app.json` to one you own first.
+Needs the Apple Developer Program ($99/yr). The bundle ID is `com.outherenow.app`; register it in your Apple Developer account (or change it in `app.json` first).
 
 ```bash
 npx eas-cli@latest build --platform ios --profile production

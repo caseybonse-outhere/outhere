@@ -1,22 +1,22 @@
 {
   "expo": {
-    "name": "Out Here",
+    "name": "OUTHERENOW",
     "slug": "outhere",
     "scheme": "outhere",
-    "version": "0.5.0",
+    "version": "0.6.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "backgroundColor": "#FBF3E6",
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.outhere.app",
+      "bundleIdentifier": "com.outherenow.app",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "package": "com.outhere.app",
+      "package": "com.outherenow.app",
       "adaptiveIcon": {
         "backgroundColor": "#3B2A55",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -34,21 +34,21 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Out Here uses your approximate location to show spots near you and to send alerts about jams within your chosen radius."
+          "locationWhenInUsePermission": "OUTHERENOW uses your approximate location to show spots near you and to send alerts about jams within your chosen radius."
         }
       ],
       "expo-notifications",
       [
         "expo-calendar",
         {
-          "calendarPermission": "Out Here adds jams you choose to your calendar."
+          "calendarPermission": "OUTHERENOW adds jams you choose to your calendar."
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "Out Here uses your photos so you can add a profile picture and jam photos.",
-          "cameraPermission": "Out Here uses the camera so you can take a profile picture or jam photo.",
+          "photosPermission": "OUTHERENOW uses your photos so you can add a profile picture and jam photos.",
+          "cameraPermission": "OUTHERENOW uses the camera so you can take a profile picture or jam photo.",
           "microphonePermission": false
         }
       ]

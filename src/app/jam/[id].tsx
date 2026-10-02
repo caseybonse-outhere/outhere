@@ -3,6 +3,7 @@ import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router
 import { useCallback, useState } from 'react';
 import { Alert, Image, Pressable, ScrollView, Text, useWindowDimensions, View } from 'react-native';
 import { useAuth } from '../../lib/auth';
+import { emitJamsChanged, useOnJamsChanged } from '../../lib/events';
 import { Avatar } from '../../lib/avatar';
 import { addJamToCalendar } from '../../lib/calendar';
 import { fetchActiveLines, fetchJamMembers } from '../../lib/data';
@@ -44,6 +45,7 @@ export default function JamScreen() {
       load().catch(() => {});
     }, [load]),
   );
+  useOnJamsChanged(() => load().catch(() => {}));
 
   if (!jam || !jam.spot || !profile) {
     return (
@@ -64,7 +66,7 @@ export default function JamScreen() {
     const { error } = await supabase.from('jam_members').insert({ event_id: jam!.id, user_id: profile!.id, role: 'member' });
     setBusy(false);
     if (error) return Alert.alert('Couldn’t join', error.message);
-    load();
+    emitJamsChanged();
   }
 
   function leave() {
@@ -78,7 +80,7 @@ export default function JamScreen() {
         style: 'destructive',
         onPress: async () => {
           await supabase.from('jam_members').delete().eq('event_id', jam!.id).eq('user_id', profile!.id);
-          load();
+          emitJamsChanged();
         },
       },
     ]);

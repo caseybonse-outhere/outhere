@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Alert, Image, ScrollView, Text, View } from 'react-native';
 import { useAuth } from '../../lib/auth';
 import { fetchSpots } from '../../lib/data';
+import { emitJamsChanged } from '../../lib/events';
 import { chooseSource, pickImage, uploadImage } from '../../lib/images';
 import { DAY_NAMES } from '../../lib/schedule';
 import { supabase } from '../../lib/supabase';
@@ -122,12 +123,18 @@ export default function NewJam() {
       cover_url: coverUrl,
       created_by: profile!.id,
     };
-    const { error } = editingId
-      ? await supabase.from('events').update(fields).eq('id', editingId)
-      : await supabase.from('events').insert(fields);
+    // .select() makes the database hand back the saved row, so a blocked or failed save can't pass silently.
+    const { data, error } = editingId
+      ? await supabase.from('events').update(fields).eq('id', editingId).select('id')
+      : await supabase.from('events').insert(fields).select('id');
     setBusy(false);
     if (error) return Alert.alert('Couldn’t save jam', error.message);
-    router.back();
+    const saved = (data ?? [])[0] as { id: string } | undefined;
+    if (!saved) return Alert.alert('Couldn’t save jam', 'Only the organizer can edit this jam.');
+
+    emitJamsChanged();
+    if (editingId) router.back();
+    else router.replace(`/jam/${saved.id}`); // show the new jam right away
   }
 
   return (
@@ -226,8 +233,9 @@ export default function NewJam() {
                   style: 'destructive',
                   onPress: async () => {
                     const { error } = await supabase.from('events').delete().eq('id', editingId);
-                    if (error) Alert.alert('Couldn’t delete', error.message);
-                    else router.back();
+                    if (error) return Alert.alert('Couldn’t delete', error.message);
+                    emitJamsChanged();
+                    router.dismissTo('/jams');
                   },
                 },
               ])

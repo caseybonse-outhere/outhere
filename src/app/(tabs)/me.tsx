@@ -158,7 +158,7 @@ export default function Me() {
         {/* Invites */}
         <Card>
           <Text style={type.h2}>Your invites</Text>
-          <Text style={type.small}>Out Here grows by word of mouth. Share a code with someone you’d want to jam with.</Text>
+          <Text style={type.small}>OUTHERENOW grows by word of mouth. Share a code with someone you’d want to jam with.</Text>
           {invites.map((i) => (
             <View key={i.code} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 44 }}>
               <Text style={[type.body, { fontWeight: '800', letterSpacing: 1, opacity: i.used_by ? 0.4 : 1 }]}>{i.code}</Text>
@@ -168,7 +168,7 @@ export default function Me() {
                 <Button
                   title="Share"
                   variant="ghost"
-                  onPress={() => Share.share({ message: `Come find us Out Here 📍 Your invite code: ${i.code}` })}
+                  onPress={() => Share.share({ message: `Come find us on OUTHERENOW 📍 Your invite code: ${i.code}` })}
                 />
               )}
             </View>

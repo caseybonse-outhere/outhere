@@ -2,6 +2,7 @@ import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router
 import { useCallback, useMemo, useState } from 'react';
 import { Alert, Linking, Pressable, ScrollView, Text, View } from 'react-native';
 import { useAuth } from '../../lib/auth';
+import { useOnJamsChanged } from '../../lib/events';
 import { Avatar } from '../../lib/avatar';
 import { addJamToCalendar } from '../../lib/calendar';
 import { block, fetchActiveLines, fetchActiveSessions, fetchEvents, fetchReviews, report } from '../../lib/data';
@@ -57,6 +58,7 @@ export default function SpotScreen() {
       load().catch(() => {});
     }, [load]),
   );
+  useOnJamsChanged(() => load().catch(() => {}));
 
   const avg = useMemo(() => (reviews.length ? reviews.reduce((a, r) => a + r.rating, 0) / reviews.length : null), [reviews]);
   const mySession = sessions.find((s) => s.user_id === profile?.id);

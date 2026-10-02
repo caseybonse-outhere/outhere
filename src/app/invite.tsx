@@ -22,7 +22,7 @@ export default function Invite() {
   return (
     <Screen>
       <ScrollView contentContainerStyle={{ padding: space.xl, gap: space.lg }} keyboardShouldPersistTaps="handled">
-        <Text style={type.title}>Out Here is invite-only</Text>
+        <Text style={type.title}>OUTHERENOW is invite-only</Text>
         <Text style={type.body}>Enter the code a member shared with you. Once you’re in, you’ll get 3 codes of your own to pass on.</Text>
         <Field label="Invite code" value={code} onChangeText={setCode} autoCapitalize="characters" placeholder="ABCD1234" />
         <Field label="What should people call you?" value={name} onChangeText={setName} placeholder="Your name or handle" maxLength={40} />

@@ -3,6 +3,7 @@ import { router, Stack, useFocusEffect } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
 import { useAuth } from '../../lib/auth';
+import { useOnJamsChanged } from '../../lib/events';
 import { addJamToCalendar } from '../../lib/calendar';
 import { fetchActiveLines, fetchEvents, fetchMyJamIds } from '../../lib/data';
 import { JamThumb } from '../../lib/jamPhoto';
@@ -58,6 +59,7 @@ export default function Jams() {
       load();
     }, [load]),
   );
+  useOnJamsChanged(load);
 
   const upcoming = useMemo(
     () =>
