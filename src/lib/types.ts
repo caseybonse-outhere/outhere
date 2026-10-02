@@ -115,13 +115,6 @@ export type Review = {
   profile?: Pick<Profile, 'display_name' | 'avatar_url'>;
 };
 
-export type Invite = {
-  code: string;
-  created_by: string | null;
-  used_by: string | null;
-  used_at: string | null;
-  created_at: string;
-};
 
 /** What any member can see about another member. */
 export type PublicProfile = Pick<Profile, 'id' | 'display_name' | 'disciplines' | 'interests' | 'bio' | 'avatar_url' | 'created_at'>;

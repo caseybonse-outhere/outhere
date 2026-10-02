@@ -14,14 +14,14 @@ function Gate() {
   const first = segments[0] as string | undefined;
   const lastResponse = Notifications.useLastNotificationResponse();
 
-  // Route people to sign-in, invite redemption, or the app.
+  // Route people to sign-in, first-time profile setup, or the app.
   useEffect(() => {
     if (loading) return;
     if (!session) {
       if (first !== 'sign-in') router.replace('/sign-in');
     } else if (!profile) {
-      if (first !== 'invite') router.replace('/invite');
-    } else if (first === 'sign-in' || first === 'invite') {
+      if (first !== 'welcome') router.replace('/welcome');
+    } else if (first === 'sign-in' || first === 'welcome') {
       router.replace('/');
     }
   }, [loading, session, profile, first]);
@@ -86,7 +86,7 @@ export default function RootLayout() {
       >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="sign-in" options={{ headerShown: false }} />
-        <Stack.Screen name="invite" options={{ title: 'Your invite', headerBackVisible: false }} />
+        <Stack.Screen name="welcome" options={{ headerShown: false }} />
         <Stack.Screen name="spot/[id]" options={{ title: '' }} />
         <Stack.Screen name="spot/new" options={{ title: 'Add a spot', presentation: 'modal' }} />
         <Stack.Screen name="camp/new" options={{ title: 'Camp', presentation: 'modal' }} />

@@ -1,19 +1,17 @@
-import { useFocusEffect } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert, Pressable, ScrollView, Share, Switch, Text, View } from 'react-native';
 import { useAuth } from '../../lib/auth';
 import { Avatar, pickAndUploadAvatar } from '../../lib/avatar';
 import { syncHomeArea } from '../../lib/device';
 import { supabase } from '../../lib/supabase';
 import { colors, space, type } from '../../lib/theme';
-import { DISCIPLINES, INTERESTS, type Invite, type Profile } from '../../lib/types';
+import { DISCIPLINES, INTERESTS, type Profile } from '../../lib/types';
 import { Button, Card, ChipGroup, Field, Screen, Segmented } from '../../lib/ui';
 
 const RADII = [1, 5, 10, 25, 50];
 
 export default function Me() {
   const { profile, refreshProfile, signOut } = useAuth();
-  const [invites, setInvites] = useState<Invite[]>([]);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -31,15 +29,6 @@ export default function Me() {
     setInterests(profile.interests ?? []);
   }, [profile?.id, profile?.display_name, profile?.bio, profile?.disciplines, profile?.interests]);
 
-  useFocusEffect(
-    useCallback(() => {
-      supabase
-        .from('invites')
-        .select('*')
-        .order('created_at')
-        .then(({ data }) => setInvites((data ?? []) as Invite[]));
-    }, []),
-  );
 
   if (!profile) return null;
 
@@ -88,8 +77,6 @@ export default function Me() {
       },
     ]);
   }
-
-  const open = invites.filter((i) => !i.used_by);
 
   return (
     <Screen>
@@ -155,25 +142,13 @@ export default function Me() {
           </View>
         </Card>
 
-        {/* Invites */}
+        {/* Share */}
         <Card>
-          <Text style={type.h2}>Your invites</Text>
-          <Text style={type.small}>OUTHERENOW grows by word of mouth. Share a code with someone you’d want to camp with.</Text>
-          {invites.map((i) => (
-            <View key={i.code} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 44 }}>
-              <Text style={[type.body, { fontWeight: '800', letterSpacing: 1, opacity: i.used_by ? 0.4 : 1 }]}>{i.code}</Text>
-              {i.used_by ? (
-                <Text style={type.small}>Used</Text>
-              ) : (
-                <Button
-                  title="Share"
-                  variant="ghost"
-                  onPress={() => Share.share({ message: `Come find us on OUTHERENOW 📍 Your invite code: ${i.code}` })}
-                />
-              )}
-            </View>
-          ))}
-          {open.length === 0 && invites.length > 0 && <Text style={type.small}>All your codes are used.</Text>}
+          <Text style={type.h2}>Bring your crew</Text>
+          <Text style={type.small}>OUTHERENOW is better with more people out here. Send it to the folks you train with.</Text>
+          <View style={{ alignSelf: 'flex-start' }}>
+            <Button title="Share OUTHERENOW" variant="ghost" onPress={() => Share.share({ message: 'Come find us on OUTHERENOW 📍 Spots, camps and who’s out right now.' })} />
+          </View>
         </Card>
 
         <Button title="Sign out" variant="secondary" onPress={signOut} />

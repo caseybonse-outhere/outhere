@@ -1,10 +1,6 @@
 -- Out Here — seed data (from the Seed_Data spreadsheet)
 -- Run after 0001_init.sql. Safe to edit and re-run pieces by hand.
 
--- Your first invite code. Redeem it in the app to become member #1,
--- then share the 3 codes the app gives you.
-insert into public.invites (code) values ('FOUNDER1') on conflict do nothing;
-
 -- Spots
 -- NOTE: Original Muscle Beach coordinates are approximate — drop a pin in Maps and update them.
 insert into public.spots (id, name, address, lat, lng, hours, disciplines, features, surface, fire_allowed, lighting, is_public, notes)

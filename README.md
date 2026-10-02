@@ -1,6 +1,6 @@
 # OUTHERENOW
 
-Invite-only map of movement-arts spots, weekly jams, and who's out right now — flow, slackline, acro, parkour.
+Map of movement-arts spots, weekly camps, and who's out right now — flow, slackline, acro, yoga, hiking and more. Open to everyone.
 
 **Stack:** Expo (React Native, SDK 57) + Expo Router · Supabase (database, email sign-in, edge function) · Expo push notifications.
 
@@ -12,7 +12,7 @@ Invite-only map of movement-arts spots, weekly jams, and who's out right now —
 | **Recurring camps** — weekly / every other week / one-off, fixed time or *at sunset* (computed per date), "Add to calendar" with a repeating event | `src/app/(tabs)/jams.tsx`, `src/app/event/new.tsx`, `src/lib/schedule.ts` |
 | **"I'm out here" sessions** — check in at a spot until 1–3 h or sunset; auto-expires | `src/app/spot/[id].tsx` |
 | **Nearby alerts** — members pick a radius (1–50 mi); new jams and check-ins push to everyone in range | `src/app/(tabs)/me.tsx`, `supabase/functions/notify-nearby` |
-| **Invite-only** — email code sign-in, then an invite code; each member gets 3 codes | `src/app/sign-in.tsx`, `src/app/invite.tsx` |
+| **Open sign-up** — email code sign-in, then pick a name | `src/app/sign-in.tsx`, `src/app/welcome.tsx` |
 | **Profiles** — photo, bio, what you do, what you're into; tap anyone checked in or reviewing to see theirs | `src/app/(tabs)/me.tsx`, `src/app/profile/[id].tsx` |
 | **Music at jams** — DJ / live / speaker badge, filter jams by DJ or any music, edit jams | `src/app/(tabs)/jams.tsx`, `src/app/event/new.tsx` |
 | **The line is up** — on slackline spots and jams, post what's rigged (type, length, until when); pin turns green | `src/lib/lines.tsx` |
@@ -38,7 +38,7 @@ npm install
 ### 2. Supabase (free tier)
 
 1. Create a project at [supabase.com](https://supabase.com).
-2. **SQL Editor → New query**: paste and run, one at a time and in this order: `supabase/migrations/0001_init.sql`, `supabase/seed.sql`, `supabase/migrations/0002_profiles_music.sql`, `supabase/migrations/0003_lines_messages_jam_members.sql`, `supabase/migrations/0004_photos.sql`, `supabase/migrations/0005_remove_gallery_messages.sql`, `supabase/migrations/0006_repair.sql`.
+2. **SQL Editor → New query**: paste and run, one at a time and in this order: `supabase/migrations/0001_init.sql`, `supabase/seed.sql`, `supabase/migrations/0002_profiles_music.sql`, `supabase/migrations/0003_lines_messages_jam_members.sql`, `supabase/migrations/0004_photos.sql`, `supabase/migrations/0005_remove_gallery_messages.sql`, `supabase/migrations/0006_repair.sql`, `supabase/migrations/0007_open_signup.sql`.
 3. **Authentication → Emails → Templates → Magic Link**: make sure the email includes the code, e.g. add
    `<p>Your OUTHERENOW code: <strong>{{ .Token }}</strong></p>`. (The app signs in with the code, not the link.)
 4. **Project Settings → API**: copy the Project URL and the `anon` public key.
@@ -49,7 +49,7 @@ npm install
 1. Install **Expo Go** from the App Store.
 2. `npx expo start` (add `--tunnel` if your phone and computer aren't on the same Wi-Fi).
 3. Scan the QR code with the iPhone camera.
-4. Sign in with your email, enter the code from the email, then invite code **`FOUNDER1`** and your name. You're member #1 — the Me tab has 3 codes to share.
+4. Sign in with your email, enter the code from the email, then pick your name.
 
 Your iPhone 8 (iOS 16) is supported; this SDK needs iOS 15.1+.
 
@@ -86,7 +86,7 @@ npx eas-cli@latest build --platform ios --profile production
 npx eas-cli@latest submit --platform ios
 ```
 
-Invite testers from App Store Connect → TestFlight. Apple's reviewer will need a demo login: create a test account and give them a spare invite code.
+Invite testers from App Store Connect → TestFlight. Apple's reviewer will need a demo login they can sign into.
 
 ---
 
