@@ -53,6 +53,27 @@ npm install
 
 Your iPhone 8 (iOS 16) is supported; this SDK needs iOS 15.1+.
 
+### 3b. Run it without the laptop (EAS Update)
+
+Publish the app to Expo's servers once, then open it in Expo Go any time — no `npx expo start`, no tunnel.
+
+One-time setup (from the project folder):
+
+```bash
+npx eas-cli@latest login     # same Expo account as Expo Go
+npx eas-cli@latest init      # links the project; writes extra.eas.projectId into app.json
+```
+
+Each time you want the phone to get the latest code:
+
+```bash
+npm run share                # = eas update --channel main --platform ios
+```
+
+Then on expo.dev → your project → **Updates** → open the newest update → **Preview** → scan the QR code with the iPhone camera (it opens in Expo Go). After the first time, the project stays in Expo Go's recent list.
+
+`runtimeVersion` uses the `sdkVersion` policy (`exposdk:57.0.0`), which is what lets Expo Go load the update. Updates are built on your computer, so your `.env` values get bundled in.
+
 ### 4. Turn on nearby alerts
 
 Alerts need an Expo project ID and the Supabase function.

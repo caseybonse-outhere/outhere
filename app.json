@@ -4,6 +4,9 @@
     "slug": "outhere",
     "scheme": "outhere",
     "version": "0.8.0",
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
