@@ -17,7 +17,6 @@ Map of movement-arts spots, weekly camps, and who's out right now — flow, slac
 | **Music at camps** — DJ / live / speaker badge, filter camps by DJ or any music | `src/app/(tabs)/camps.tsx`, `src/app/camp/new.tsx` |
 | **Going this week** — "I'm going Wednesday" for a camp's next session; who's going on the camp page, "8 going" on camp cards | `src/lib/going.tsx` |
 | **Share links + QR codes** — share any camp or spot as a link, or show a QR code to print for a sign; links open the app via `docs/open.html` | `src/lib/share.ts`, `src/app/share.tsx` |
-| **Meeting-point pins** — organizers pin exactly where a camp meets (plus a "how to find us" note); line posts can pin where the line is rigged; Directions opens Apple Maps | `src/lib/pins.tsx` |
 | **The line is up** — on slackline spots and camps, post what's rigged (type, length, until when); pin turns green | `src/lib/lines.tsx` |
 | **Camp communities** — camp page with Join / Leave, members and organizer, My camps filter | `src/app/camp/[id].tsx` |
 | **Camp photos** — cover photo per camp; thumbnails on cards and spot pages | `src/lib/jamPhoto.tsx`, `src/app/camp/new.tsx` |

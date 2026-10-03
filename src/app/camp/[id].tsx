@@ -8,7 +8,6 @@ import { Avatar } from '../../lib/avatar';
 import { addJamToCalendar } from '../../lib/calendar';
 import { fetchActiveLines, fetchJamMembers, fetchUpcomingRsvps } from '../../lib/data';
 import { goingFor, GoingSection } from '../../lib/going';
-import { PinMap } from '../../lib/pins';
 import { shareLink, showQr } from '../../lib/share';
 import { JamThumb } from '../../lib/jamPhoto';
 import { LineSection } from '../../lib/lines';
@@ -71,10 +70,6 @@ export default function CampScreen() {
   const slackliney = jam.disciplines.includes(SLACKLINE) || (spot.disciplines ?? []).includes(SLACKLINE);
   const canEdit = jam.created_by === profile.id || profile.is_admin;
   const organizer = members.find((m) => m.role === 'organizer');
-  const meetPin =
-    jam.meet_lat != null && jam.meet_lng != null
-      ? { lat: jam.meet_lat, lng: jam.meet_lng, title: `${jam.name} meets here`, description: jam.meet_note ?? undefined }
-      : null;
 
   async function join() {
     setBusy(true);
@@ -147,15 +142,6 @@ export default function CampScreen() {
             <Text style={type.body}>{jam.description}</Text>
           </Card>
         ) : null}
-
-        {/* Meeting point */}
-        {(meetPin || jam.meet_note) && (
-          <Card>
-            <Text style={type.h2}>Meeting point</Text>
-            {jam.meet_note ? <Text style={type.body}>{jam.meet_note}</Text> : null}
-            {meetPin && <PinMap pins={[meetPin]} />}
-          </Card>
-        )}
 
         {/* Membership */}
         <Card>

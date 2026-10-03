@@ -1,19 +1,16 @@
--- OUTHERENOW — v0.10: "Going this week" and meeting-point pins
+-- OUTHERENOW — v0.10: "Going this week"
+-- (Meeting-point pins were tried and removed before launch; the block below cleans up their columns if an earlier copy of this file added them.)
 -- Paste into Supabase: SQL Editor → New query → Run. Safe to run more than once. Run after 0008.
 
--- ─── Meeting-point pins ───────────────────────────────────────────────────
--- A camp can mark exactly where people meet ("by the rings, south end"),
--- and a line post can mark where the line is rigged. These mark places, never people.
-alter table public.events
-  add column if not exists meet_lat double precision,
-  add column if not exists meet_lng double precision,
-  add column if not exists meet_note text;
+-- ─── Remove meeting-point pin columns (if present) ────────────────────────
 alter table public.events drop constraint if exists events_meet_note_len;
-alter table public.events add constraint events_meet_note_len check (char_length(meet_note) <= 120);
-
+alter table public.events
+  drop column if exists meet_lat,
+  drop column if exists meet_lng,
+  drop column if exists meet_note;
 alter table public.lines
-  add column if not exists pin_lat double precision,
-  add column if not exists pin_lng double precision;
+  drop column if exists pin_lat,
+  drop column if exists pin_lng;
 
 -- ─── "Going this week" ────────────────────────────────────────────────────
 -- One row per person per camp session (the local date the session starts).

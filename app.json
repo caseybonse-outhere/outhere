@@ -3,7 +3,7 @@
     "name": "OUTHERENOW",
     "slug": "outhere",
     "scheme": "outhere",
-    "version": "0.10.0",
+    "version": "0.10.1",
     "runtimeVersion": {
       "policy": "sdkVersion"
     },
