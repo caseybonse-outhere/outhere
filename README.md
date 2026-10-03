@@ -78,7 +78,7 @@ npx eas-cli@latest init      # links the project; writes extra.eas.projectId int
 Each time you want the phone to get the latest code:
 
 ```bash
-npm run share                # = eas update --channel main --platform ios
+npm run share                # = eas update --channel main --platform ios --environment production
 ```
 
 Then on expo.dev → your project → **Updates** → open the newest update → **Preview** → scan the QR code with the iPhone camera (it opens in Expo Go). After the first time, the project stays in Expo Go's recent list.
