@@ -5,12 +5,14 @@ import { FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
 import { useAuth } from '../../lib/auth';
 import { useOnJamsChanged } from '../../lib/events';
 import { addJamToCalendar } from '../../lib/calendar';
-import { fetchActiveLines, fetchEvents, fetchMyJamIds } from '../../lib/data';
+import { fetchActiveLines, fetchEvents, fetchMyJamIds, fetchUpcomingRsvps } from '../../lib/data';
+import { GoingBadge, goingFor } from '../../lib/going';
+import { shareLink } from '../../lib/share';
 import { JamThumb } from '../../lib/jamPhoto';
 import { LineUpBadge } from '../../lib/lines';
 import { describeSchedule, formatWhen, nextOccurrence } from '../../lib/schedule';
 import { colors, radius, space, type } from '../../lib/theme';
-import { MUSIC_LABEL, SLACKLINE, type JamEvent } from '../../lib/types';
+import { MUSIC_LABEL, SLACKLINE, type JamEvent, type Rsvp } from '../../lib/types';
 import { Button, Card, Chip, Empty, Screen, Segmented } from '../../lib/ui';
 
 type JamFilter = 'all' | 'mine' | 'dj' | 'music';
@@ -36,17 +38,20 @@ export default function Camps() {
   const [filter, setFilter] = useState<JamFilter>('all');
   const [myJams, setMyJams] = useState<Set<string>>(new Set());
   const [lineSpots, setLineSpots] = useState<Set<string>>(new Set());
+  const [rsvps, setRsvps] = useState<Rsvp[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
 
   const userId = profile?.id;
   const load = useCallback(async () => {
     setRefreshing(true);
     try {
-      const [e, mine, lines] = await Promise.all([
+      const [e, mine, lines, going] = await Promise.all([
         fetchEvents(),
         userId ? fetchMyJamIds(userId) : Promise.resolve(new Set<string>()),
         fetchActiveLines().catch(() => []),
+        fetchUpcomingRsvps().catch(() => [] as Rsvp[]),
       ]);
+      setRsvps(going);
       setEvents(e);
       setMyJams(mine);
       setLineSpots(new Set(lines.map((l) => l.spot_id)));
@@ -152,6 +157,10 @@ export default function Camps() {
                   return `${n} ${n === 1 ? 'member' : 'members'}${myJams.has(event.id) ? ' · You’re in' : ''}`;
                 })()}
               </Text>
+              {(() => {
+                const going = goingFor(rsvps, event.id, occ);
+                return <GoingBadge count={going.length} mine={going.some((r) => r.user_id === profile?.id)} />;
+              })()}
               {lineSpots.has(event.spot_id) &&
                 (event.disciplines.includes(SLACKLINE) || (event.spot?.disciplines ?? []).includes(SLACKLINE)) && <LineUpBadge />}
               {event.disciplines.length > 0 && (
@@ -161,9 +170,10 @@ export default function Camps() {
                   ))}
                 </View>
               )}
-              <View style={{ flexDirection: 'row', gap: space.sm, marginTop: space.xs }}>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm, marginTop: space.xs }}>
                 <Button title="Add to calendar" variant="ghost" onPress={() => addJamToCalendar(event, occ!)} />
-                {/* Organizers edit their own jams; unclaimed (seeded) jams can be claimed by the first member who edits them. */}
+                <Button title="Share" variant="ghost" onPress={() => shareLink('camp', event.id, event.name, formatWhen(occ!))} />
+                {/* Organizers (and admins) edit camps. */}
                 {(event.created_by === profile?.id || profile?.is_admin) && (
                   <Button title="Edit" variant="ghost" onPress={() => router.push({ pathname: '/camp/new', params: { id: event.id } })} />
                 )}

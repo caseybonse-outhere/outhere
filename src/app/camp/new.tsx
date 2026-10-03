@@ -5,6 +5,7 @@ import { useAuth } from '../../lib/auth';
 import { fetchSpots } from '../../lib/data';
 import { emitJamsChanged } from '../../lib/events';
 import { chooseSource, pickImage, uploadImage } from '../../lib/images';
+import { PinPicker, type LatLng } from '../../lib/pins';
 import { DAY_NAMES } from '../../lib/schedule';
 import { supabase } from '../../lib/supabase';
 import { colors, radius, space, type } from '../../lib/theme';
@@ -49,6 +50,8 @@ export default function NewCamp() {
   const [organizer, setOrganizer] = useState('');
   const [music, setMusic] = useState<Music | null>(null);
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
+  const [meetPin, setMeetPin] = useState<LatLng | null>(null);
+  const [meetNote, setMeetNote] = useState('');
   const [uploading, setUploading] = useState(false);
   const [existing, setExisting] = useState<JamEvent | null>(null);
   const [busy, setBusy] = useState(false);
@@ -82,9 +85,12 @@ export default function NewCamp() {
         setOrganizer(e.organizer ?? '');
         setMusic(e.music);
         setCoverUrl(e.cover_url);
+        setMeetPin(e.meet_lat != null && e.meet_lng != null ? { lat: e.meet_lat, lng: e.meet_lng } : null);
+        setMeetNote(e.meet_note ?? '');
       });
   }, [editingId]);
 
+  const selectedSpot = spots.find((s) => s.id === spotId);
   const parsed = parseTime(time);
   const valid = name.trim() && spotId && (startType === 'sunset' || parsed);
 
@@ -121,6 +127,9 @@ export default function NewCamp() {
       organizer: organizer.trim() || null,
       music,
       cover_url: coverUrl,
+      meet_lat: meetPin?.lat ?? null,
+      meet_lng: meetPin?.lng ?? null,
+      meet_note: meetNote.trim() || null,
     };
     // .select() makes the database hand back the saved row, so a blocked or failed save can't pass silently.
     const { data, error } = editingId
@@ -159,7 +168,27 @@ export default function NewCamp() {
         {spots.length === 0 ? (
           <Empty text="Add a spot on the map first." />
         ) : (
-          <Segmented options={spots.map((s) => ({ label: s.name, value: s.id }))} value={spotId} onChange={setSpotId} />
+          <Segmented
+            options={spots.map((s) => ({ label: s.name, value: s.id }))}
+            value={spotId}
+            onChange={(v) => {
+              if (v !== spotId) setMeetPin(null); // a pin only makes sense inside its own spot
+              setSpotId(v);
+            }}
+          />
+        )}
+
+        {selectedSpot && (
+          <>
+            <Text style={type.label}>Meeting point (optional)</Text>
+            <PinPicker
+              spot={selectedSpot}
+              value={meetPin}
+              onChange={setMeetPin}
+              hint="Big spot? Tap the map to drop a pin where people meet."
+            />
+            <Field label="How to find you (optional)" value={meetNote} onChangeText={setMeetNote} maxLength={120} placeholder="By the rings, south end — look for the flag" />
+          </>
         )}
 
         <Text style={type.label}>How often</Text>

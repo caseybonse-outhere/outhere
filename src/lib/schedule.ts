@@ -88,3 +88,16 @@ export function sunsetToday(lat: number, lng: number): Date {
   const now = new Date();
   return SunCalc.getTimes(now, lat, lng).sunset ?? new Date(now.getFullYear(), now.getMonth(), now.getDate(), 19);
 }
+
+/** Local calendar date (YYYY-MM-DD) of a moment — used to key "going" sign-ups to a session. */
+export function localDate(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/** "today", "tomorrow", or the weekday name, for "Going Wednesday" style labels. */
+export function dayLabel(d: Date, now = new Date()): string {
+  const days = Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() - new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()) / 86400000);
+  if (days === 0) return 'today';
+  if (days === 1) return 'tomorrow';
+  return DAY_NAMES[d.getDay()];
+}

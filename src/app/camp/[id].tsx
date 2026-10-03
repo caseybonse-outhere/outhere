@@ -6,13 +6,16 @@ import { useAuth } from '../../lib/auth';
 import { emitJamsChanged, useOnJamsChanged } from '../../lib/events';
 import { Avatar } from '../../lib/avatar';
 import { addJamToCalendar } from '../../lib/calendar';
-import { fetchActiveLines, fetchJamMembers } from '../../lib/data';
+import { fetchActiveLines, fetchJamMembers, fetchUpcomingRsvps } from '../../lib/data';
+import { goingFor, GoingSection } from '../../lib/going';
+import { PinMap } from '../../lib/pins';
+import { shareLink, showQr } from '../../lib/share';
 import { JamThumb } from '../../lib/jamPhoto';
 import { LineSection } from '../../lib/lines';
 import { describeSchedule, formatWhen, nextOccurrence } from '../../lib/schedule';
 import { supabase } from '../../lib/supabase';
 import { colors, radius, space, type } from '../../lib/theme';
-import { MUSIC_LABEL, SLACKLINE, type JamEvent, type JamMember, type Line } from '../../lib/types';
+import { MUSIC_LABEL, SLACKLINE, type JamEvent, type JamMember, type Line, type Rsvp } from '../../lib/types';
 import { Button, Card, Chip, Empty, Screen } from '../../lib/ui';
 import { postMenu, ReportLink } from '../../lib/moderation';
 
@@ -23,6 +26,7 @@ export default function CampScreen() {
   const [jam, setJam] = useState<JamEvent | null>(null);
   const [members, setMembers] = useState<JamMember[]>([]);
   const [lines, setLines] = useState<Line[]>([]);
+  const [rsvps, setRsvps] = useState<Rsvp[]>([]);
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
@@ -36,9 +40,14 @@ export default function CampScreen() {
     setJam(e);
     setLoaded(true);
     if (!e) return;
-    const [m, l] = await Promise.all([fetchJamMembers(id), fetchActiveLines(e.spot_id).catch(() => [] as Line[])]);
+    const [m, l, r] = await Promise.all([
+      fetchJamMembers(id),
+      fetchActiveLines(e.spot_id).catch(() => [] as Line[]),
+      fetchUpcomingRsvps(id).catch(() => [] as Rsvp[]),
+    ]);
     setMembers(m);
     setLines(l);
+    setRsvps(r);
   }, [id]);
 
   useFocusEffect(
@@ -62,6 +71,10 @@ export default function CampScreen() {
   const slackliney = jam.disciplines.includes(SLACKLINE) || (spot.disciplines ?? []).includes(SLACKLINE);
   const canEdit = jam.created_by === profile.id || profile.is_admin;
   const organizer = members.find((m) => m.role === 'organizer');
+  const meetPin =
+    jam.meet_lat != null && jam.meet_lng != null
+      ? { lat: jam.meet_lat, lng: jam.meet_lng, title: `${jam.name} meets here`, description: jam.meet_note ?? undefined }
+      : null;
 
   async function join() {
     setBusy(true);
@@ -127,11 +140,22 @@ export default function CampScreen() {
           )}
         </View>
 
+        {occ && <GoingSection eventId={jam.id} occ={occ} userId={profile.id} going={goingFor(rsvps, jam.id, occ)} onChange={() => { load().catch(() => {}); emitJamsChanged(); }} />}
+
         {jam.description ? (
           <Card>
             <Text style={type.body}>{jam.description}</Text>
           </Card>
         ) : null}
+
+        {/* Meeting point */}
+        {(meetPin || jam.meet_note) && (
+          <Card>
+            <Text style={type.h2}>Meeting point</Text>
+            {jam.meet_note ? <Text style={type.body}>{jam.meet_note}</Text> : null}
+            {meetPin && <PinMap pins={[meetPin]} />}
+          </Card>
+        )}
 
         {/* Membership */}
         <Card>
@@ -173,6 +197,14 @@ export default function CampScreen() {
         {/* Actions */}
         <View style={{ gap: space.sm }}>
           {occ && <Button title="Add to calendar" variant="secondary" onPress={() => addJamToCalendar(jam, occ)} />}
+          <View style={{ flexDirection: 'row', gap: space.sm }}>
+            <View style={{ flex: 1 }}>
+              <Button title="Share" variant="ghost" onPress={() => shareLink('camp', jam.id, jam.name, occ ? formatWhen(occ) : undefined)} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Button title="QR code" variant="ghost" onPress={() => showQr('camp', jam.id, jam.name)} />
+            </View>
+          </View>
           {canEdit && <Button title="Edit camp" variant="ghost" onPress={() => router.push({ pathname: '/camp/new', params: { id: jam.id } })} />}
           {jam.created_by !== profile.id && (
             <ReportLink

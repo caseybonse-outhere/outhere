@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
-import type { JamEvent, JamMember, Line, OpenReport, ReportTarget, Review, Session, Spot } from './types';
+import { localDate } from './schedule';
+import type { JamEvent, JamMember, Line, OpenReport, ReportTarget, Review, Rsvp, Session, Spot } from './types';
 
 export async function fetchSpots(): Promise<Spot[]> {
   const { data, error } = await supabase.from('spots').select('*').order('name');
@@ -89,4 +90,27 @@ export async function fetchJamMembers(eventId: string): Promise<JamMember[]> {
 export async function fetchMyJamIds(userId: string): Promise<Set<string>> {
   const { data } = await supabase.from('jam_members').select('event_id').eq('user_id', userId);
   return new Set((data ?? []).map((r: { event_id: string }) => r.event_id));
+}
+
+/** Everyone going to upcoming camp sessions (yesterday through the next two weeks). */
+export async function fetchUpcomingRsvps(eventId?: string): Promise<Rsvp[]> {
+  const now = new Date();
+  const from = localDate(new Date(now.getTime() - 86400000));
+  const to = localDate(new Date(now.getTime() + 15 * 86400000));
+  let q = supabase
+    .from('camp_rsvps')
+    .select('event_id, user_id, occurs_on, profile:profiles(display_name, avatar_url)')
+    .gte('occurs_on', from)
+    .lte('occurs_on', to)
+    .order('created_at');
+  if (eventId) q = q.eq('event_id', eventId);
+  const { data, error } = await q;
+  if (error) throw error;
+  return (data ?? []) as unknown as Rsvp[];
+}
+
+export async function setGoing(eventId: string, userId: string, occursOn: string, going: boolean) {
+  return going
+    ? supabase.from('camp_rsvps').insert({ event_id: eventId, user_id: userId, occurs_on: occursOn })
+    : supabase.from('camp_rsvps').delete().eq('event_id', eventId).eq('user_id', userId).eq('occurs_on', occursOn);
 }

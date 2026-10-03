@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Alert, Pressable, Text, View } from 'react-native';
 import { Avatar } from './avatar';
 import { postMenu } from './moderation';
+import { PinMap, PinPicker, type LatLng, type Pin } from './pins';
 import { formatTime, sunsetToday } from './schedule';
 import { supabase } from './supabase';
 import { colors, radius, space, type } from './theme';
@@ -47,7 +48,7 @@ export function LineSection({
   userId,
   onChange,
 }: {
-  spot: { id: string; lat: number; lng: number };
+  spot: { id: string; lat: number; lng: number; name?: string };
   lines: Line[];
   userId: string;
   onChange: () => void;
@@ -57,8 +58,12 @@ export function LineSection({
   const [length, setLength] = useState('');
   const [until, setUntil] = useState<Until>('2h');
   const [note, setNote] = useState('');
+  const [pin, setPin] = useState<LatLng | null>(null);
   const [busy, setBusy] = useState(false);
   const mine = lines.find((l) => l.user_id === userId);
+  const pinned: Pin[] = lines
+    .filter((l) => l.pin_lat != null && l.pin_lng != null)
+    .map((l) => ({ lat: l.pin_lat!, lng: l.pin_lng!, title: describeLine(l), description: `Rigged by ${l.profile?.display_name ?? 'a member'}` }));
 
   async function post() {
     const now = new Date();
@@ -74,12 +79,15 @@ export function LineSection({
       length_ft: Number.isFinite(ft) && ft >= 5 ? ft : null,
       note: note.trim() || null,
       up_until: ends.toISOString(),
+      pin_lat: pin?.lat ?? null,
+      pin_lng: pin?.lng ?? null,
     });
     setBusy(false);
     if (error) return Alert.alert('Couldn’t post your line', error.message);
     setPosting(false);
     setLength('');
     setNote('');
+    setPin(null);
     onChange();
   }
 
@@ -130,6 +138,8 @@ export function LineSection({
         ))
       )}
 
+      {pinned.length > 0 && <PinMap pins={pinned} height={160} />}
+
       {mine ? (
         <Button title="My line is down" variant="ghost" onPress={takeDown} />
       ) : posting ? (
@@ -153,6 +163,8 @@ export function LineSection({
             onChange={setUntil}
           />
           <Field label="Note (optional)" value={note} onChangeText={setNote} maxLength={200} placeholder="Beginner-friendly, bring a harness, spare line…" />
+          <Text style={type.label}>Where it’s rigged (optional)</Text>
+          <PinPicker spot={{ lat: spot.lat, lng: spot.lng, name: spot.name ?? 'this spot' }} value={pin} onChange={setPin} hint="Tap the map to pin the line so people can find it." />
           <Button title="The line is up" onPress={post} loading={busy} />
           <Button title="Cancel" variant="ghost" onPress={() => setPosting(false)} />
         </View>

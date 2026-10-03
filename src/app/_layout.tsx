@@ -115,6 +115,7 @@ export default function RootLayout() {
         <Stack.Screen name="legal/[doc]" options={{ title: '' }} />
         <Stack.Screen name="admin" options={{ title: 'Reports' }} />
         <Stack.Screen name="support" options={{ title: 'Contact support', presentation: 'modal' }} />
+        <Stack.Screen name="share" options={{ title: 'Share', presentation: 'modal' }} />
       </Stack>
       <Gate />
     </AuthProvider>

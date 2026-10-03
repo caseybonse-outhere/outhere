@@ -4,7 +4,7 @@ Map of movement-arts spots, weekly camps, and who's out right now — flow, slac
 
 **Stack:** Expo (React Native, SDK 57) + Expo Router · Supabase (database, email sign-in, edge function) · Expo push notifications.
 
-## What’s in v0.9
+## What’s in v0.10
 
 | Feature | Where |
 |---|---|
@@ -15,6 +15,9 @@ Map of movement-arts spots, weekly camps, and who's out right now — flow, slac
 | **Open sign-up** — email code sign-in, then pick a name and agree to the Terms (18+) | `src/app/sign-in.tsx`, `src/app/welcome.tsx` |
 | **Profiles** — photo, bio, what you do, what you're into; tap anyone checked in or reviewing to see theirs | `src/app/(tabs)/me.tsx`, `src/app/profile/[id].tsx` |
 | **Music at camps** — DJ / live / speaker badge, filter camps by DJ or any music | `src/app/(tabs)/camps.tsx`, `src/app/camp/new.tsx` |
+| **Going this week** — "I'm going Wednesday" for a camp's next session; who's going on the camp page, "8 going" on camp cards | `src/lib/going.tsx` |
+| **Share links + QR codes** — share any camp or spot as a link, or show a QR code to print for a sign; links open the app via `docs/open.html` | `src/lib/share.ts`, `src/app/share.tsx` |
+| **Meeting-point pins** — organizers pin exactly where a camp meets (plus a "how to find us" note); line posts can pin where the line is rigged; Directions opens Apple Maps | `src/lib/pins.tsx` |
 | **The line is up** — on slackline spots and camps, post what's rigged (type, length, until when); pin turns green | `src/lib/lines.tsx` |
 | **Camp communities** — camp page with Join / Leave, members and organizer, My camps filter | `src/app/camp/[id].tsx` |
 | **Camp photos** — cover photo per camp; thumbnails on cards and spot pages | `src/lib/jamPhoto.tsx`, `src/app/camp/new.tsx` |
@@ -41,7 +44,7 @@ npm install
 ### 2. Supabase (free tier)
 
 1. Create a project at [supabase.com](https://supabase.com).
-2. **SQL Editor → New query**: paste and run, one at a time and in this order: `supabase/migrations/0001_init.sql`, `supabase/seed.sql`, `supabase/migrations/0002_profiles_music.sql`, `supabase/migrations/0003_lines_messages_jam_members.sql`, `supabase/migrations/0004_photos.sql`, `supabase/migrations/0005_remove_gallery_messages.sql`, `supabase/migrations/0006_repair.sql`, `supabase/migrations/0007_open_signup.sql`, `supabase/migrations/0008_app_store.sql`.
+2. **SQL Editor → New query**: paste and run, one at a time and in this order: `supabase/migrations/0001_init.sql`, `supabase/seed.sql`, `supabase/migrations/0002_profiles_music.sql`, `supabase/migrations/0003_lines_messages_jam_members.sql`, `supabase/migrations/0004_photos.sql`, `supabase/migrations/0005_remove_gallery_messages.sql`, `supabase/migrations/0006_repair.sql`, `supabase/migrations/0007_open_signup.sql`, `supabase/migrations/0008_app_store.sql`, `supabase/migrations/0009_going_pins.sql`.
 3. **Authentication → Emails → Templates → Magic Link**: make sure the email includes the code, e.g. add
    `<p>Your OUTHERENOW code: <strong>{{ .Token }}</strong></p>`. (The app signs in with the code, not the link.)
 4. **Project Settings → API**: copy the Project URL and the `anon` public key.
@@ -135,6 +138,9 @@ The App Store listing needs a Privacy Policy URL and a Support URL. The same tex
    - Privacy Policy: `https://caseybonse-outhere.github.io/outhere/privacy.html`
    - Support: `https://caseybonse-outhere.github.io/outhere/support.html`
    - Terms: `https://caseybonse-outhere.github.io/outhere/terms.html`
+   - Share links land on `https://caseybonse-outhere.github.io/outhere/open.html?camp=<id>`, which opens the app. Once the app is on the App Store, set `APP_STORE_URL` in `docs/open.html` so the "Get OUTHERENOW" button goes there.
+
+Share links open the installed app (TestFlight / App Store). Expo Go can't be opened by `outhere://` links, so while testing in Expo Go they only show the web page.
 
 
 ### 5. TestFlight (when you're ready)

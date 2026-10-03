@@ -90,6 +90,10 @@ export type JamEvent = {
   organizer: string | null;
   music: Music | null;
   cover_url: string | null;
+  /** Exact meeting point inside the spot, set by the organizer. */
+  meet_lat: number | null;
+  meet_lng: number | null;
+  meet_note: string | null;
   created_by: string | null;
   created_at: string;
   spot?: Pick<Spot, 'id' | 'name' | 'lat' | 'lng' | 'address' | 'disciplines'>;
@@ -141,7 +145,18 @@ export type Line = {
   length_ft: number | null;
   note: string | null;
   up_until: string;
+  /** Where the line is rigged, if the poster dropped a pin. */
+  pin_lat: number | null;
+  pin_lng: number | null;
   created_at: string;
+  profile?: Pick<Profile, 'display_name' | 'avatar_url'>;
+};
+
+/** "I'm going" for one camp session (occurs_on = local date the session starts). */
+export type Rsvp = {
+  event_id: string;
+  user_id: string;
+  occurs_on: string;
   profile?: Pick<Profile, 'display_name' | 'avatar_url'>;
 };
 

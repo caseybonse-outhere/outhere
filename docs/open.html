@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open in OUTHERENOW</title>
+<meta name="description" content="Spots, camps and who's out right now — flow, slackline, acro, yoga, hiking and more.">
+<style>
+  :root { --sand:#FBF3E6; --night:#1E1A24; --muted:#5A5163; --coral:#C44B32; --dusk:#3B2A55; --card:#FFFFFF; }
+  @media (prefers-color-scheme: dark) { :root { --sand:#1E1A24; --night:#FBF3E6; --muted:#C9BFD3; --coral:#F08A70; --dusk:#C9B6F0; --card:#2A2433; } }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; background:var(--sand); color:var(--night); font:17px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display:flex; align-items:center; justify-content:center; }
+  main { width:100%; max-width:420px; padding:32px 16px; text-align:center; }
+  .brand { font-weight:800; font-size:28px; letter-spacing:-1px; margin:12px 0 4px; }
+  .card { background:var(--card); border-radius:18px; padding:24px 20px; margin-top:24px; }
+  h1 { font-size:22px; margin:0 0 8px; }
+  p { color:var(--muted); margin:8px 0; }
+  .btn { display:block; width:100%; min-height:52px; line-height:52px; border-radius:999px; background:var(--coral); color:#fff; font-weight:700; text-decoration:none; margin-top:16px; }
+  .btn.ghost { background:transparent; color:var(--dusk); border:1.5px solid var(--dusk); line-height:49px; }
+  .small { font-size:14px; }
+</style>
+</head>
+<body>
+<main>
+  <svg width="64" height="64" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4C30 4 16 18 16 37c0 25 34 57 34 57s34-32 34-57C84 18 70 4 50 4z" fill="#E8654A"/><circle cx="50" cy="36" r="16" fill="#FBF3E6"/></svg>
+  <div class="brand">OUTHERENOW</div>
+  <p class="small">Spots, camps and who’s out right now.</p>
+  <div class="card">
+    <h1 id="title">Open in the app</h1>
+    <p id="lead">Someone shared this with you on OUTHERENOW.</p>
+    <a class="btn" id="open" href="outhere://">Open in OUTHERENOW</a>
+    <a class="btn ghost" id="get" href="index.html">Get OUTHERENOW</a>
+    <p class="small" id="note">Don’t have the app yet? It’s coming soon to the App Store for iPhone.</p>
+  </div>
+</main>
+<script>
+  // Set APP_STORE_URL once the app is live, and the "Get" button will point there.
+  var APP_STORE_URL = '';
+  var params = new URLSearchParams(location.search);
+  var uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  var kind = params.has('camp') ? 'camp' : params.has('spot') ? 'spot' : null;
+  var id = kind ? params.get(kind) : null;
+  if (kind && id && uuid.test(id)) {
+    document.getElementById('open').href = 'outhere://' + kind + '/' + id;
+    document.getElementById('title').textContent = kind === 'camp' ? 'Someone shared a camp' : 'Someone shared a spot';
+    document.getElementById('lead').textContent = 'Open it in OUTHERENOW to see when it’s on, who’s going and where to meet.';
+  }
+  if (APP_STORE_URL) {
+    document.getElementById('get').href = APP_STORE_URL;
+    document.getElementById('note').textContent = 'Free on the App Store for iPhone.';
+  }
+</script>
+</body>
+</html>

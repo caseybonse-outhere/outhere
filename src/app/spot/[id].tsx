@@ -9,6 +9,7 @@ import { fetchActiveLines, fetchActiveSessions, fetchEvents, fetchReviews } from
 import { postMenu, reportContent, ReportLink } from '../../lib/moderation';
 import { JamThumb } from '../../lib/jamPhoto';
 import { LineSection } from '../../lib/lines';
+import { shareLink, showQr } from '../../lib/share';
 import { describeSchedule, formatTime, formatWhen, nextOccurrence, sunsetToday } from '../../lib/schedule';
 import { supabase } from '../../lib/supabase';
 import { colors, space, type } from '../../lib/theme';
@@ -246,6 +247,14 @@ export default function SpotScreen() {
           {reviews.length > 0 && <Text style={type.small}>Long-press a review to report it or block its author.</Text>}
         </Card>
 
+        <View style={{ flexDirection: 'row', gap: space.sm }}>
+          <View style={{ flex: 1 }}>
+            <Button title="Share spot" variant="ghost" onPress={() => shareLink('spot', s.id, s.name)} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Button title="QR code" variant="ghost" onPress={() => showQr('spot', s.id, s.name)} />
+          </View>
+        </View>
         {s.created_by !== profile.id && <ReportLink label="Report this spot" onPress={() => reportContent(profile.id, 'spot', s.id, 'spot')} />}
       </ScrollView>
     </Screen>
