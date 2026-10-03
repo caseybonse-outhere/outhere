@@ -85,3 +85,24 @@ export function storagePathFromUrl(url: string, bucket: 'avatars' | 'photos'): s
   const i = url.indexOf(marker);
   return i === -1 ? null : decodeURIComponent(url.slice(i + marker.length));
 }
+
+/** Every file path under a folder in a bucket (folders come back from list() with no id). */
+async function listAll(bucket: string, folder: string): Promise<string[]> {
+  const { data, error } = await supabase.storage.from(bucket).list(folder, { limit: 1000 });
+  if (error || !data) return [];
+  const paths: string[] = [];
+  for (const item of data) {
+    const path = `${folder}/${item.name}`;
+    if (item.id) paths.push(path);
+    else paths.push(...(await listAll(bucket, path)));
+  }
+  return paths;
+}
+
+/** Delete everything this member uploaded (profile and camp photos). Used when deleting an account. */
+export async function deleteMyFiles(userId: string): Promise<void> {
+  for (const bucket of ['avatars', 'photos']) {
+    const paths = await listAll(bucket, userId);
+    if (paths.length) await supabase.storage.from(bucket).remove(paths);
+  }
+}

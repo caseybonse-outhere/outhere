@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import type { JamEvent, JamMember, Line, Review, Session, Spot } from './types';
+import type { JamEvent, JamMember, Line, OpenReport, ReportTarget, Review, Session, Spot } from './types';
 
 export async function fetchSpots(): Promise<Spot[]> {
   const { data, error } = await supabase.from('spots').select('*').order('name');
@@ -46,8 +46,15 @@ export async function fetchReviews(spotId: string): Promise<Review[]> {
   return (data ?? []) as Review[];
 }
 
-export async function report(reporterId: string, targetType: 'spot' | 'review' | 'event' | 'session' | 'profile', targetId: string) {
-  return supabase.from('reports').insert({ reporter_id: reporterId, target_type: targetType, target_id: targetId });
+export async function report(reporterId: string, targetType: ReportTarget, targetId: string, reason?: string) {
+  return supabase.from('reports').insert({ reporter_id: reporterId, target_type: targetType, target_id: targetId, reason: reason ?? null });
+}
+
+/** Admins only: everything people have reported that hasn't been handled yet. */
+export async function fetchOpenReports(): Promise<OpenReport[]> {
+  const { data, error } = await supabase.rpc('admin_open_reports');
+  if (error) throw error;
+  return (data ?? []) as OpenReport[];
 }
 
 export async function block(blockerId: string, blockedId: string) {

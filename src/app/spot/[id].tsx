@@ -5,7 +5,8 @@ import { useAuth } from '../../lib/auth';
 import { useOnJamsChanged } from '../../lib/events';
 import { Avatar } from '../../lib/avatar';
 import { addJamToCalendar } from '../../lib/calendar';
-import { block, fetchActiveLines, fetchActiveSessions, fetchEvents, fetchReviews, report } from '../../lib/data';
+import { fetchActiveLines, fetchActiveSessions, fetchEvents, fetchReviews } from '../../lib/data';
+import { postMenu, reportContent, ReportLink } from '../../lib/moderation';
 import { JamThumb } from '../../lib/jamPhoto';
 import { LineSection } from '../../lib/lines';
 import { describeSchedule, formatTime, formatWhen, nextOccurrence, sunsetToday } from '../../lib/schedule';
@@ -104,12 +105,8 @@ export default function SpotScreen() {
     load();
   }
 
-  function moderate(kind: 'review' | 'session', targetId: string, userId: string) {
-    Alert.alert('Report or block', undefined, [
-      { text: 'Report', onPress: async () => { await report(profile!.id, kind, targetId); Alert.alert('Thanks — we’ll take a look.'); } },
-      { text: 'Block this person', style: 'destructive', onPress: async () => { await block(profile!.id, userId); load(); } },
-      { text: 'Cancel', style: 'cancel' },
-    ]);
+  function moderate(kind: 'review' | 'session', targetId: string, userId: string, name?: string) {
+    postMenu({ me: profile!.id, ownerId: userId, ownerName: name, targetType: kind, targetId, what: kind === 'review' ? 'review' : 'check-in', onBlocked: load });
   }
 
   return (
@@ -140,7 +137,7 @@ export default function SpotScreen() {
                 key={x.id}
                 accessibilityRole="button"
                 onPress={() => router.push(`/profile/${x.user_id}`)}
-                onLongPress={() => x.user_id !== profile.id && moderate('session', x.id, x.user_id)}
+                onLongPress={() => x.user_id !== profile.id && moderate('session', x.id, x.user_id, x.profile?.display_name)}
                 style={{ minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: space.md }}
               >
                 <Avatar url={x.profile?.avatar_url} name={x.profile?.display_name} size={36} />
@@ -234,7 +231,7 @@ export default function SpotScreen() {
             <Pressable
               key={r.id}
               onPress={() => router.push(`/profile/${r.user_id}`)}
-              onLongPress={() => r.user_id !== profile.id && moderate('review', r.id, r.user_id)}
+              onLongPress={() => r.user_id !== profile.id && moderate('review', r.id, r.user_id, r.profile?.display_name)}
               style={{ paddingTop: space.sm, gap: 2 }}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
@@ -249,14 +246,7 @@ export default function SpotScreen() {
           {reviews.length > 0 && <Text style={type.small}>Long-press a review to report it or block its author.</Text>}
         </Card>
 
-        <Button
-          title="Report this spot"
-          variant="ghost"
-          onPress={async () => {
-            await report(profile.id, 'spot', s.id);
-            Alert.alert('Thanks — we’ll take a look.');
-          }}
-        />
+        {s.created_by !== profile.id && <ReportLink label="Report this spot" onPress={() => reportContent(profile.id, 'spot', s.id, 'spot')} />}
       </ScrollView>
     </Screen>
   );

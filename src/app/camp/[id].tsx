@@ -14,6 +14,7 @@ import { supabase } from '../../lib/supabase';
 import { colors, radius, space, type } from '../../lib/theme';
 import { MUSIC_LABEL, SLACKLINE, type JamEvent, type JamMember, type Line } from '../../lib/types';
 import { Button, Card, Chip, Empty, Screen } from '../../lib/ui';
+import { postMenu, ReportLink } from '../../lib/moderation';
 
 export default function CampScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -59,7 +60,8 @@ export default function CampScreen() {
   const occ = nextOccurrence(jam, spot.lat, spot.lng);
   const me = members.find((m) => m.user_id === profile.id);
   const slackliney = jam.disciplines.includes(SLACKLINE) || (spot.disciplines ?? []).includes(SLACKLINE);
-  const canEdit = jam.created_by === profile.id || jam.created_by == null;
+  const canEdit = jam.created_by === profile.id || profile.is_admin;
+  const organizer = members.find((m) => m.role === 'organizer');
 
   async function join() {
     setBusy(true);
@@ -172,6 +174,25 @@ export default function CampScreen() {
         <View style={{ gap: space.sm }}>
           {occ && <Button title="Add to calendar" variant="secondary" onPress={() => addJamToCalendar(jam, occ)} />}
           {canEdit && <Button title="Edit camp" variant="ghost" onPress={() => router.push({ pathname: '/camp/new', params: { id: jam.id } })} />}
+          {jam.created_by !== profile.id && (
+            <ReportLink
+              label="Report camp"
+              onPress={() =>
+                postMenu({
+                  me: profile.id,
+                  ownerId: jam.created_by,
+                  ownerName: organizer?.profile?.display_name ?? 'the organizer',
+                  targetType: 'event',
+                  targetId: jam.id,
+                  what: 'camp',
+                  onBlocked: () => {
+                    emitJamsChanged();
+                    router.back();
+                  },
+                })
+              }
+            />
+          )}
         </View>
       </ScrollView>
     </Screen>

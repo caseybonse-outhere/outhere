@@ -38,11 +38,11 @@ export function Button({
   );
 }
 
-export function Field({ label, ...props }: TextInputProps & { label: string }) {
+export function Field({ label, style, ...props }: TextInputProps & { label: string }) {
   return (
     <View style={{ gap: space.xs }}>
       <Text style={type.label}>{label}</Text>
-      <TextInput placeholderTextColor={colors.muted} style={[styles.input, props.multiline && { minHeight: 88, textAlignVertical: 'top' }]} {...props} />
+      <TextInput placeholderTextColor={colors.muted} {...props} style={[styles.input, props.multiline && { minHeight: 88, textAlignVertical: 'top' }, style]} />
     </View>
   );
 }

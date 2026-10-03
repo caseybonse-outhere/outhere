@@ -1,0 +1,184 @@
+{
+  "appName": "OUTHERENOW",
+  "contactEmail": "",
+  "updated": "October 2, 2026",
+  "docs": {
+    "terms": {
+      "title": "Terms of Use",
+      "intro": "These terms are an agreement between you and OUTHERENOW (\"we\", \"us\"). By creating an account or using the app you agree to them. If you don't agree, please don't use OUTHERENOW.",
+      "sections": [
+        {
+          "heading": "Who can use OUTHERENOW",
+          "body": [
+            "You must be 18 or older to use OUTHERENOW.",
+            "You're responsible for your account and for everything posted from it. Keep access to your email secure, since that's how you sign in."
+          ]
+        },
+        {
+          "heading": "No tolerance for objectionable content or abusive users",
+          "body": [
+            "OUTHERENOW has zero tolerance for objectionable content and abusive behavior. You agree not to post or share anything that is hateful, harassing, threatening, sexually explicit, violent, discriminatory, defamatory, illegal, spam, or that shares someone else's private information.",
+            "You agree to follow the Community Guidelines, which are part of these terms.",
+            "Anyone can report content or a person from inside the app, and anyone can block another member. We review reports within 24 hours. We remove content that breaks these terms and we suspend or permanently ban the accounts that posted it."
+          ]
+        },
+        {
+          "heading": "Your content",
+          "body": [
+            "You keep ownership of what you post (spots, camps, reviews, photos, check-ins, line posts and your profile). You give us a non-exclusive, worldwide, royalty-free license to host, store, display and share that content inside OUTHERENOW so the app can work.",
+            "Only post photos and information you have the right to share. Don't post photos of other people without their permission."
+          ]
+        },
+        {
+          "heading": "Movement arts are physical — take care of yourself",
+          "body": [
+            "Slackline, acro, parkour, flow arts, rings, hiking and the other activities on OUTHERENOW carry a real risk of injury. You take part at your own risk. Use proper safety gear and spotters, rig lines safely, check conditions, and know your limits.",
+            "Spots, camps, times, line posts and other information come from members and may be wrong or out of date. Always check local rules, permits, park hours, fire restrictions and posted signs yourself.",
+            "Camps and meetups are organized by members, not by us. We don't screen members and we aren't responsible for what happens at a spot or camp. Meet in public places, trust your instincts, and leave if something feels wrong."
+          ]
+        },
+        {
+          "heading": "Ending your account",
+          "body": [
+            "You can delete your account at any time from the Me tab. We may suspend or end accounts that break these terms."
+          ]
+        },
+        {
+          "heading": "Disclaimers and limits of liability",
+          "body": [
+            "OUTHERENOW is provided \"as is\" and \"as available\", without warranties of any kind. To the fullest extent allowed by law, we are not liable for any indirect, incidental, special or consequential damages, or for any injury, loss or damage arising from your use of the app, from content posted by members, or from attending any spot or camp."
+          ]
+        },
+        {
+          "heading": "Apple",
+          "body": [
+            "If you downloaded OUTHERENOW from the App Store, these terms are between you and us, not Apple. Apple's Standard Licensed Application End User License Agreement also applies, and Apple has no obligation to provide support for the app."
+          ]
+        },
+        {
+          "heading": "Changes and contact",
+          "body": [
+            "We may update these terms. If the changes are significant, we'll ask you to agree again in the app.",
+            "Questions? {contact}"
+          ]
+        }
+      ]
+    },
+    "guidelines": {
+      "title": "Community Guidelines",
+      "intro": "OUTHERENOW is for touching grass together. These guidelines keep it a good place to be.",
+      "sections": [
+        {
+          "heading": "Be kind and keep it real",
+          "body": [
+            "Treat people the way you'd want to be treated at a jam. No harassment, bullying, hate speech, threats, or discrimination of any kind.",
+            "Post real spots, real camps and honest reviews. No spam, ads, or fake listings."
+          ]
+        },
+        {
+          "heading": "Keep it safe",
+          "body": [
+            "Don't share anyone's private information, including where someone lives.",
+            "No sexual content, nudity or graphic violence in photos, names, bios or descriptions.",
+            "Don't promote dangerous or illegal activity. Respect park rules, fire restrictions and the land."
+          ]
+        },
+        {
+          "heading": "If something's wrong",
+          "body": [
+            "Use Report on the spot, camp, review, line post or profile, or long-press a person to report or block them. Blocking hides their posts from you right away.",
+            "We review every report within 24 hours. Content that breaks these guidelines is removed, and accounts that post it are suspended or banned.",
+            "If someone is in danger, call 911 or your local emergency number first."
+          ]
+        }
+      ]
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "intro": "This policy explains what OUTHERENOW collects, why, and the choices you have. We don't sell your information and we don't use it for advertising or tracking.",
+      "sections": [
+        {
+          "heading": "What we collect",
+          "body": [
+            "Account: your email address, used to send sign-in codes.",
+            "Profile: the name, photo, bio, activities and interests you choose to add.",
+            "Things you post: spots, camps (including camp photos), reviews, \"I'm out here now\" check-ins, line posts, camp memberships, reports and blocks.",
+            "Approximate location: if you allow it, the app uses your location to center the map. For nearby alerts we save only your rough area, rounded to about 1 km. We never store your exact location.",
+            "Notifications: if you turn on alerts, we save a push token for your device so we can send them.",
+            "Support messages you send us from the app."
+          ]
+        },
+        {
+          "heading": "How we use it",
+          "body": [
+            "To run the app: show spots, camps and who's out now, send sign-in codes and nearby alerts, keep members safe, review reports, and respond to support messages.",
+            "Your name, photo, bio, activities, interests and the things you post are visible to other signed-in members. Your email, rough area and push token are never shown to other members."
+          ]
+        },
+        {
+          "heading": "Services we use",
+          "body": [
+            "Supabase hosts our database, sign-in and photo storage. Resend delivers sign-in emails. Expo and Apple deliver push notifications. They process data only to provide these services to us."
+          ]
+        },
+        {
+          "heading": "How long we keep it",
+          "body": [
+            "Check-ins and line posts expire on their own within 12 hours. Everything else is kept until you delete it or delete your account."
+          ]
+        },
+        {
+          "heading": "Your choices",
+          "body": [
+            "You can edit your profile, delete what you've posted, turn off alerts, and turn off location or notifications in iPhone Settings at any time.",
+            "Delete your account from the Me tab. This permanently deletes your profile, photos, reviews, check-ins, line posts, camp memberships and the camps you started. Spots you added stay on the map without your name.",
+            "To ask for a copy of your data or for help with anything here: {contact}"
+          ]
+        },
+        {
+          "heading": "Age",
+          "body": [
+            "OUTHERENOW is for people 18 and older. We don't knowingly collect information from children."
+          ]
+        },
+        {
+          "heading": "Changes",
+          "body": [
+            "If we change this policy we'll update the date above, and tell you in the app if the change is significant."
+          ]
+        }
+      ]
+    },
+    "support": {
+      "title": "Support",
+      "intro": "Need help with OUTHERENOW? We're here.",
+      "sections": [
+        {
+          "heading": "Contact us",
+          "body": [
+            "{contact}",
+            "We reply to support messages and review every report within 24 hours."
+          ]
+        },
+        {
+          "heading": "Signing in",
+          "body": [
+            "Enter your email and we'll send you a code. Check your spam folder if it doesn't arrive within a minute. Codes expire after a short time, so request a new one if needed."
+          ]
+        },
+        {
+          "heading": "Reporting and blocking",
+          "body": [
+            "Tap Report on any spot, camp, review, line post or profile. Long-press a person who's checked in to report or block them. Blocked members' posts and camps are hidden from you."
+          ]
+        },
+        {
+          "heading": "Deleting your account",
+          "body": [
+            "Open the Me tab and tap Delete account. This can't be undone."
+          ]
+        }
+      ]
+    }
+  }
+}

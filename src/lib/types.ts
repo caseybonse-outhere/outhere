@@ -48,6 +48,9 @@ export type Profile = {
   home_lng: number | null;
   push_token: string | null;
   created_at: string;
+  terms_accepted_at: string | null;
+  is_admin: boolean;
+  banned_at: string | null;
 };
 
 export type Spot = {
@@ -152,3 +155,19 @@ export type JamMember = {
 
 /** Slackline is the discipline that unlocks "the line is up". */
 export const SLACKLINE = 'Slackline';
+
+export type ReportTarget = 'spot' | 'review' | 'event' | 'session' | 'profile' | 'line';
+
+/** One open report, as the moderation screen sees it. */
+export type OpenReport = {
+  id: string;
+  target_type: ReportTarget;
+  target_id: string;
+  reason: string | null;
+  created_at: string;
+  reporter_name: string | null;
+  owner_id: string | null;
+  owner_name: string | null;
+  owner_banned: boolean | null;
+  preview: string;
+};

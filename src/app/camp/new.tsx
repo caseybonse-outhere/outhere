@@ -121,12 +121,11 @@ export default function NewCamp() {
       organizer: organizer.trim() || null,
       music,
       cover_url: coverUrl,
-      created_by: profile!.id,
     };
     // .select() makes the database hand back the saved row, so a blocked or failed save can't pass silently.
     const { data, error } = editingId
       ? await supabase.from('events').update(fields).eq('id', editingId).select('id')
-      : await supabase.from('events').insert(fields).select('id');
+      : await supabase.from('events').insert({ ...fields, created_by: profile!.id }).select('id');
     setBusy(false);
     if (error) return Alert.alert('Couldn’t save camp', error.message);
     const saved = (data ?? [])[0] as { id: string } | undefined;
@@ -221,7 +220,7 @@ export default function NewCamp() {
         <Field label="Description (optional)" value={description} onChangeText={setDescription} multiline placeholder="What to bring, skill level, vibe…" />
 
         <Button title={editingId ? 'Save camp' : 'Start camp'} onPress={save} loading={busy} disabled={!valid} />
-        {editingId && existing?.created_by === profile?.id && (
+        {editingId && (existing?.created_by === profile?.id || profile?.is_admin) && (
           <Button
             title="Delete camp"
             variant="danger"

@@ -1,0 +1,63 @@
+// Builds the public web pages (docs/) from src/lib/legal.json — the same text the app shows.
+// Run after editing legal.json:  npm run legal
+// GitHub Pages serves docs/ at https://caseybonse-outhere.github.io/outhere/
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+
+const legal = JSON.parse(readFileSync(new URL('../src/lib/legal.json', import.meta.url), 'utf8'));
+const out = new URL('../docs/', import.meta.url);
+mkdirSync(out, { recursive: true });
+
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const contact = legal.contactEmail
+  ? `Email <a href="mailto:${esc(legal.contactEmail)}">${esc(legal.contactEmail)}</a>, or use Contact support on the Me tab in the app.`
+  : 'Use Contact support on the Me tab in the OUTHERENOW app.';
+const fill = (s) => esc(s).replace('{contact}', contact);
+
+const order = ['terms', 'guidelines', 'privacy', 'support'];
+const nav = order.map((id) => `<a href="${id}.html">${esc(legal.docs[id].title)}</a>`).join(' · ');
+
+function page(title, body) {
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${esc(title)} — ${esc(legal.appName)}</title>
+<style>
+  :root { --sand:#FBF3E6; --night:#1E1A24; --muted:#5A5163; --coral:#C44B32; --dusk:#3B2A55; }
+  @media (prefers-color-scheme: dark) { :root { --sand:#1E1A24; --night:#FBF3E6; --muted:#C9BFD3; --coral:#F08A70; --dusk:#C9B6F0; } }
+  body { margin:0; background:var(--sand); color:var(--night); font:17px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  main { max-width:680px; margin:0 auto; padding:32px 16px 64px; }
+  .brand { font-weight:800; letter-spacing:-0.5px; color:var(--dusk); text-decoration:none; font-size:20px; }
+  h1 { font-size:32px; line-height:1.2; margin:24px 0 4px; letter-spacing:-0.5px; }
+  h2 { font-size:20px; margin:32px 0 8px; }
+  .muted { color:var(--muted); font-size:15px; }
+  a { color:var(--coral); }
+  nav { margin-top:48px; padding-top:16px; border-top:1px solid color-mix(in srgb, var(--night) 15%, transparent); font-size:15px; }
+</style>
+</head>
+<body><main>
+<a class="brand" href="index.html">${esc(legal.appName)}</a>
+${body}
+<nav>${nav}</nav>
+</main></body>
+</html>
+`;
+}
+
+for (const id of order) {
+  const d = legal.docs[id];
+  const sections = d.sections
+    .map((s) => `<h2>${esc(s.heading)}</h2>\n${s.body.map((p) => `<p>${fill(p)}</p>`).join('\n')}`)
+    .join('\n');
+  writeFileSync(new URL(`${id}.html`, out), page(d.title, `<h1>${esc(d.title)}</h1>\n<p class="muted">Last updated ${esc(legal.updated)}</p>\n<p>${fill(d.intro)}</p>\n${sections}`));
+}
+
+writeFileSync(
+  new URL('index.html', out),
+  page(legal.appName, `<h1>Spots, camps and who’s out right now.</h1>
+<p>${esc(legal.appName)} is a free iPhone app for the movement arts community — flow, slackline, acro, parkour, rings, dance, juggling, yoga and hiking. Find spots, start camps, and see who’s out here now.</p>
+<p>${contact}</p>`),
+);
+writeFileSync(new URL('.nojekyll', out), '');
+console.log('Wrote docs/ for', order.join(', '));

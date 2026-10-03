@@ -13,7 +13,9 @@ export function emitJamsChanged() {
 
 export function useOnJamsChanged(fn: () => void) {
   const ref = useRef(fn);
-  ref.current = fn;
+  useEffect(() => {
+    ref.current = fn;
+  });
   useEffect(() => {
     const handler = () => ref.current();
     listeners.add(handler);

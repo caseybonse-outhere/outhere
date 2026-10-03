@@ -38,12 +38,13 @@ export default function Camps() {
   const [lineSpots, setLineSpots] = useState<Set<string>>(new Set());
   const [loadError, setLoadError] = useState<string | null>(null);
 
+  const userId = profile?.id;
   const load = useCallback(async () => {
     setRefreshing(true);
     try {
       const [e, mine, lines] = await Promise.all([
         fetchEvents(),
-        profile ? fetchMyJamIds(profile.id) : Promise.resolve(new Set<string>()),
+        userId ? fetchMyJamIds(userId) : Promise.resolve(new Set<string>()),
         fetchActiveLines().catch(() => []),
       ]);
       setEvents(e);
@@ -54,7 +55,7 @@ export default function Camps() {
       setLoadError(err instanceof Error ? err.message : String((err as { message?: string })?.message ?? err));
     }
     setRefreshing(false);
-  }, [profile?.id]);
+  }, [userId]);
 
   useFocusEffect(
     useCallback(() => {
@@ -163,7 +164,7 @@ export default function Camps() {
               <View style={{ flexDirection: 'row', gap: space.sm, marginTop: space.xs }}>
                 <Button title="Add to calendar" variant="ghost" onPress={() => addJamToCalendar(event, occ!)} />
                 {/* Organizers edit their own jams; unclaimed (seeded) jams can be claimed by the first member who edits them. */}
-                {(event.created_by === profile?.id || event.created_by == null) && (
+                {(event.created_by === profile?.id || profile?.is_admin) && (
                   <Button title="Edit" variant="ghost" onPress={() => router.push({ pathname: '/camp/new', params: { id: event.id } })} />
                 )}
               </View>

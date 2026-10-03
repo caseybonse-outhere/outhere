@@ -5,39 +5,59 @@ import { useEffect } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 import { AuthProvider, useAuth } from '../lib/auth';
 import { registerForPush, syncHomeArea } from '../lib/device';
+import { SUPPORT_EMAIL } from '../lib/legal';
 import { isConfigured } from '../lib/supabase';
 import { colors, space, type } from '../lib/theme';
+import { Button } from '../lib/ui';
 
 function Gate() {
-  const { loading, session, profile } = useAuth();
+  const { loading, session, profile, signOut } = useAuth();
   const segments = useSegments();
   const first = segments[0] as string | undefined;
   const lastResponse = Notifications.useLastNotificationResponse();
 
-  // Route people to sign-in, first-time profile setup, or the app.
+  const banned = !!profile?.banned_at;
+  const member = !!profile && !!profile.terms_accepted_at && !banned;
+
+  // Route people to sign-in, first-time setup (name + Terms), or the app. Legal pages are open to everyone.
   useEffect(() => {
-    if (loading) return;
+    if (loading || banned || first === 'legal') return;
     if (!session) {
       if (first !== 'sign-in') router.replace('/sign-in');
-    } else if (!profile) {
+    } else if (!member) {
       if (first !== 'welcome') router.replace('/welcome');
     } else if (first === 'sign-in' || first === 'welcome') {
       router.replace('/');
     }
-  }, [loading, session, profile, first]);
+  }, [loading, session, member, banned, first]);
 
-  // Once someone is a member, save their rough area and push token for nearby alerts.
+  // Refresh the member's rough area and push token, without asking for permission at launch.
+  // (The map asks for location when it opens; alerts ask for notifications when switched on.)
+  const profileId = profile?.id;
   useEffect(() => {
-    if (!profile) return;
-    syncHomeArea(profile.id);
-    registerForPush(profile.id);
-  }, [profile?.id]);
+    if (!member || !profileId) return;
+    syncHomeArea(profileId, false);
+    registerForPush(profileId, false);
+  }, [member, profileId]);
 
   // Tapping an alert opens the spot it's about.
   useEffect(() => {
     const spotId = lastResponse?.notification.request.content.data?.spotId;
-    if (profile && typeof spotId === 'string') router.push(`/spot/${spotId}`);
-  }, [lastResponse, profile]);
+    if (member && typeof spotId === 'string') router.push(`/spot/${spotId}`);
+  }, [lastResponse, member]);
+
+  if (banned) {
+    return (
+      <View style={{ ...overlay, padding: space.xl, gap: space.lg }}>
+        <Text style={[type.title, { textAlign: 'center' }]}>Account suspended</Text>
+        <Text style={[type.body, { textAlign: 'center' }]}>
+          This account was suspended for breaking the OUTHERENOW Terms or Community Guidelines.
+        </Text>
+        {SUPPORT_EMAIL ? <Text style={[type.small, { textAlign: 'center' }]}>Think this is a mistake? Email {SUPPORT_EMAIL}.</Text> : null}
+        <Button title="Sign out" variant="secondary" onPress={signOut} />
+      </View>
+    );
+  }
 
   if (loading) {
     return (
@@ -92,6 +112,9 @@ export default function RootLayout() {
         <Stack.Screen name="camp/new" options={{ title: 'Camp', presentation: 'modal' }} />
         <Stack.Screen name="profile/[id]" options={{ title: '' }} />
         <Stack.Screen name="camp/[id]" options={{ title: '' }} />
+        <Stack.Screen name="legal/[doc]" options={{ title: '' }} />
+        <Stack.Screen name="admin" options={{ title: 'Reports' }} />
+        <Stack.Screen name="support" options={{ title: 'Contact support', presentation: 'modal' }} />
       </Stack>
       <Gate />
     </AuthProvider>

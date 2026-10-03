@@ -1,9 +1,9 @@
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { useAuth } from '../../lib/auth';
 import { Avatar } from '../../lib/avatar';
-import { block, report } from '../../lib/data';
+import { blockPerson, reportContent } from '../../lib/moderation';
 import { supabase } from '../../lib/supabase';
 import { space, type } from '../../lib/theme';
 import { PUBLIC_PROFILE_COLUMNS, type PublicProfile } from '../../lib/types';
@@ -78,31 +78,8 @@ export default function ProfileScreen() {
 
         {!isMe && me && (
           <View style={{ gap: space.sm }}>
-            <Button
-              title="Report"
-              variant="ghost"
-              onPress={async () => {
-                await report(me.id, 'profile', person.id);
-                Alert.alert('Thanks — we’ll take a look.');
-              }}
-            />
-            <Button
-              title="Block"
-              variant="ghost"
-              onPress={() =>
-                Alert.alert(`Block ${person.display_name}?`, 'You won’t see their check-ins or reviews.', [
-                  { text: 'Cancel', style: 'cancel' },
-                  {
-                    text: 'Block',
-                    style: 'destructive',
-                    onPress: async () => {
-                      await block(me.id, person.id);
-                      Alert.alert('Blocked.');
-                    },
-                  },
-                ])
-              }
-            />
+            <Button title="Report" variant="ghost" onPress={() => reportContent(me.id, 'profile', person.id, 'profile')} />
+            <Button title="Block" variant="ghost" onPress={() => blockPerson(me.id, person.id, person.display_name, () => router.back())} />
           </View>
         )}
       </ScrollView>

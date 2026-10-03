@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Pressable, Text, View } from 'react-native';
 import { Avatar } from './avatar';
+import { postMenu } from './moderation';
 import { formatTime, sunsetToday } from './schedule';
 import { supabase } from './supabase';
 import { colors, radius, space, type } from './theme';
@@ -82,6 +83,10 @@ export function LineSection({
     onChange();
   }
 
+  function lineMenu(l: Line) {
+    postMenu({ me: userId, ownerId: l.user_id, ownerName: l.profile?.display_name, targetType: 'line', targetId: l.id, what: 'line post', onBlocked: onChange });
+  }
+
   async function takeDown() {
     if (!mine) return;
     await supabase.from('lines').delete().eq('id', mine.id);
@@ -103,6 +108,7 @@ export function LineSection({
             key={l.id}
             accessibilityRole="button"
             onPress={() => router.push(`/profile/${l.user_id}`)}
+            onLongPress={() => lineMenu(l)}
             style={{ minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: space.md }}
           >
             <Avatar url={l.profile?.avatar_url} name={l.profile?.display_name} size={36} />
@@ -115,6 +121,11 @@ export function LineSection({
                 {l.note ? ` — ${l.note}` : ''}
               </Text>
             </View>
+            {l.user_id !== userId && (
+              <Pressable accessibilityRole="button" accessibilityLabel="Report or block" onPress={() => lineMenu(l)} hitSlop={8} style={{ minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center' }}>
+                <Ionicons name="ellipsis-horizontal" size={20} color={colors.muted} />
+              </Pressable>
+            )}
           </Pressable>
         ))
       )}

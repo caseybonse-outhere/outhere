@@ -1,8 +1,12 @@
-import { useEffect, useState } from 'react';
-import { Alert, Pressable, ScrollView, Share, Switch, Text, View } from 'react-native';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useEffect, useState } from 'react';
+import { Alert, Linking, Pressable, ScrollView, Share, Switch, Text, View } from 'react-native';
 import { useAuth } from '../../lib/auth';
 import { Avatar, pickAndUploadAvatar } from '../../lib/avatar';
-import { syncHomeArea } from '../../lib/device';
+import { fetchOpenReports } from '../../lib/data';
+import { notificationsAllowed, registerForPush, syncHomeArea } from '../../lib/device';
+import { deleteMyFiles } from '../../lib/images';
+import { LegalLinks } from '../../lib/moderation';
 import { supabase } from '../../lib/supabase';
 import { colors, space, type } from '../../lib/theme';
 import { DISCIPLINES, INTERESTS, type Profile } from '../../lib/types';
@@ -21,13 +25,33 @@ export default function Me() {
   const [disciplines, setDisciplines] = useState<string[]>([]);
   const [interests, setInterests] = useState<string[]>([]);
 
+  const [pushOn, setPushOn] = useState(true);
   useEffect(() => {
-    if (!profile) return;
+    notificationsAllowed().then(setPushOn);
+  }, []);
+
+  // Admins see how many reports are waiting.
+  const isAdmin = !!profile?.is_admin;
+  const [openReports, setOpenReports] = useState<number | null>(null);
+  useFocusEffect(
+    useCallback(() => {
+      if (!isAdmin) return;
+      fetchOpenReports()
+        .then((r) => setOpenReports(r.length))
+        .catch(() => setOpenReports(null));
+    }, [isAdmin]),
+  );
+
+  // Copy the saved profile into the form whenever it changes (adjusting state during render, per React docs).
+  const savedSig = profile ? JSON.stringify([profile.id, profile.display_name, profile.bio, profile.disciplines, profile.interests]) : '';
+  const [syncedSig, setSyncedSig] = useState('');
+  if (profile && savedSig !== syncedSig) {
+    setSyncedSig(savedSig);
     setName(profile.display_name);
     setBio(profile.bio ?? '');
     setDisciplines(profile.disciplines ?? []);
     setInterests(profile.interests ?? []);
-  }, [profile?.id, profile?.display_name, profile?.bio, profile?.disciplines, profile?.interests]);
+  }
 
 
   if (!profile) return null;
@@ -63,13 +87,33 @@ export default function Me() {
     }
   }
 
+  async function toggleAlerts(on: boolean) {
+    await update({ alerts_enabled: on });
+    if (on) await turnOnAlerts();
+  }
+
+  /** Ask for notifications and location only when someone actually wants alerts. */
+  async function turnOnAlerts() {
+    const token = await registerForPush(profile!.id, true);
+    if (!token && !(await notificationsAllowed())) {
+      Alert.alert('Notifications are off', 'To get nearby alerts, allow notifications for this app in the iPhone Settings app.', [
+        { text: 'Not now', style: 'cancel' },
+        { text: 'Open Settings', onPress: () => Linking.openSettings() },
+      ]);
+    }
+    if (profile!.home_lat == null) await syncHomeArea(profile!.id, true);
+    setPushOn(await notificationsAllowed());
+    await refreshProfile();
+  }
+
   function confirmDelete() {
-    Alert.alert('Delete your account?', 'This removes your profile, reviews and sessions. It can’t be undone.', [
+    Alert.alert('Delete your account?', 'This permanently deletes your profile, photos, reviews, check-ins, lines and the camps you started. It can’t be undone.', [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Delete',
         style: 'destructive',
         onPress: async () => {
+          await deleteMyFiles(profile!.id).catch(() => undefined); // photos first, while we still own them
           const { error } = await supabase.rpc('delete_my_account');
           if (error) Alert.alert('Couldn’t delete account', error.message);
           else await signOut();
@@ -115,7 +159,7 @@ export default function Me() {
             <Text style={[type.body, { flex: 1 }]}>Tell me about new camps and people out here</Text>
             <Switch
               value={profile.alerts_enabled}
-              onValueChange={(v) => update({ alerts_enabled: v })}
+              onValueChange={toggleAlerts}
               trackColor={{ true: colors.coralDark }}
               accessibilityLabel="Nearby alerts"
             />
@@ -126,6 +170,11 @@ export default function Me() {
             value={profile.alert_radius_miles}
             onChange={(r) => update({ alert_radius_miles: r })}
           />
+          {profile.alerts_enabled && !pushOn && (
+            <View style={{ alignSelf: 'flex-start' }}>
+              <Button title="Turn on notifications" variant="secondary" onPress={turnOnAlerts} />
+            </View>
+          )}
           <Text style={type.small}>
             Alerts use your rough area (to about 1 km), never your exact location.
             {profile.home_lat == null ? ' Your area isn’t set yet.' : ''}
@@ -149,6 +198,28 @@ export default function Me() {
           <View style={{ alignSelf: 'flex-start' }}>
             <Button title="Share OUTHERENOW" variant="ghost" onPress={() => Share.share({ message: 'Come find us on OUTHERENOW 📍 Spots, camps and who’s out right now.' })} />
           </View>
+        </Card>
+
+        {profile.is_admin && (
+          <Card>
+            <Text style={type.h2}>Moderation</Text>
+            <Text style={type.small}>
+              {openReports == null ? 'Reports people have sent.' : openReports === 0 ? 'No open reports. Nice.' : `${openReports} open ${openReports === 1 ? 'report' : 'reports'} — review within 24 hours.`}
+            </Text>
+            <View style={{ alignSelf: 'flex-start' }}>
+              <Button title="Review reports" variant={openReports ? 'primary' : 'ghost'} onPress={() => router.push('/admin')} />
+            </View>
+          </Card>
+        )}
+
+        {/* Help & legal */}
+        <Card>
+          <Text style={type.h2}>Help & safety</Text>
+          <Text style={type.small}>Report anything that breaks the rules from its page, or long-press a person to report or block them.</Text>
+          <View style={{ alignSelf: 'flex-start' }}>
+            <Button title="Contact support" variant="ghost" onPress={() => router.push('/support')} />
+          </View>
+          <LegalLinks />
         </Card>
 
         <Button title="Sign out" variant="secondary" onPress={signOut} />
