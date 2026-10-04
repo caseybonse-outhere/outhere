@@ -134,10 +134,10 @@ The App Store listing needs a Privacy Policy URL and a Support URL. The same tex
 1. Put your support email in `"contactEmail"` in `src/lib/legal.json` and run `npm run legal`.
 2. GitHub → repo **Settings → Pages** → Source: *Deploy from a branch* → `main` / `/docs` → Save.
 3. A minute later they're live:
-   - Privacy Policy: `https://caseybonse-outhere.github.io/outhere/privacy.html`
-   - Support: `https://caseybonse-outhere.github.io/outhere/support.html`
-   - Terms: `https://caseybonse-outhere.github.io/outhere/terms.html`
-   - Share links land on `https://caseybonse-outhere.github.io/outhere/open.html?camp=<id>`, which opens the app. Once the app is on the App Store, set `APP_STORE_URL` in `docs/open.html` so the "Get OUTHERENOW" button goes there.
+   - Privacy Policy: `https://outherenow.app/privacy.html`
+   - Support: `https://outherenow.app/support.html`
+   - Terms: `https://outherenow.app/terms.html`
+   - Share links land on `https://outherenow.app/open.html?camp=<id>`, which opens the app. Once the app is on the App Store, set `APP_STORE_URL` in `docs/open.html` so the "Get OUTHERENOW" button goes there.
 
 Share links open the installed app (TestFlight / App Store). Expo Go can't be opened by `outhere://` links, so while testing in Expo Go they only show the web page.
 

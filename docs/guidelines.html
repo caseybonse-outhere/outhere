@@ -4,21 +4,47 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Community Guidelines — OUTHERENOW</title>
+<meta name="description" content="Adventure, camps and who’s out right now. A free iPhone app for flow arts, slackline, acro, parkour, dance, yoga, hiking and more.">
+<meta property="og:title" content="Out Here Now">
+<meta property="og:description" content="Adventure, camps and who’s out right now">
+<meta name="theme-color" content="#3B2A55">
+<link rel="icon" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&display=swap">
 <style>
-  :root { --sand:#FBF3E6; --night:#1E1A24; --muted:#5A5163; --coral:#C44B32; --dusk:#3B2A55; }
-  @media (prefers-color-scheme: dark) { :root { --sand:#1E1A24; --night:#FBF3E6; --muted:#C9BFD3; --coral:#F08A70; --dusk:#C9B6F0; } }
-  body { margin:0; background:var(--sand); color:var(--night); font:17px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-  main { max-width:680px; margin:0 auto; padding:32px 16px 64px; }
-  .brand { font-weight:800; letter-spacing:-0.5px; color:var(--dusk); text-decoration:none; font-size:20px; }
-  h1 { font-size:32px; line-height:1.2; margin:24px 0 4px; letter-spacing:-0.5px; }
-  h2 { font-size:20px; margin:32px 0 8px; }
+  :root { --sand:#FBF3E6; --sand2:#F3E4CC; --night:#1E1A24; --muted:#5A5163; --now:#C44B32; --link:#C44B32; --dusk:#3B2A55; --live:#3E8E5E; --rule:rgba(30,26,36,.14); }
+  @media (prefers-color-scheme: dark) { :root { --sand:#16121C; --sand2:#241D2E; --night:#FBF3E6; --muted:#C9BFD3; --now:#F08A70; --link:#F08A70; --dusk:#C9B6F0; --live:#6FCF97; --rule:rgba(251,243,230,.16); } }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--sand); color:var(--night); font:17px/1.6 'Bricolage Grotesque', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  main { max-width:720px; margin:0 auto; padding:24px 16px 64px; }
+  a { color:var(--link); }
+  .brand { display:inline-flex; align-items:center; gap:10px; text-decoration:none; color:var(--night); font-weight:800; font-size:22px; letter-spacing:-0.03em; min-height:44px; }
+  .brand .now, .lockup .now { color:var(--now); }
+  .live { display:inline-block; width:12px; height:12px; border-radius:50%; background:var(--live); box-shadow:0 0 0 4px color-mix(in srgb, var(--live) 28%, transparent); vertical-align:middle; margin-left:12px; }
+  h1 { font-size:34px; line-height:1.15; margin:28px 0 6px; letter-spacing:-0.02em; }
+  h2 { font-size:21px; margin:32px 0 8px; }
   .muted { color:var(--muted); font-size:15px; }
-  a { color:var(--coral); }
-  nav { margin-top:48px; padding-top:16px; border-top:1px solid color-mix(in srgb, var(--night) 15%, transparent); font-size:15px; }
+  nav { margin-top:56px; padding-top:16px; border-top:1px solid var(--rule); font-size:15px; display:flex; flex-wrap:wrap; gap:4px 14px; }
+  nav a { min-height:44px; display:inline-flex; align-items:center; }
+  /* Home */
+  .hero { padding:56px 0 24px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:22px; }
+  .lockup { display:flex; align-items:center; gap:20px; text-align:left; }
+  .lockup .words { font-weight:800; font-size:clamp(48px, 13vw, 76px); line-height:.92; letter-spacing:-0.035em; }
+  .lockup .pin { width:clamp(72px, 18vw, 112px); height:auto; flex:none; }
+  .tagline { font-size:clamp(18px, 4.6vw, 22px); font-weight:500; color:var(--muted); margin:0; }
+  .soon { display:inline-block; background:var(--dusk); color:var(--sand); font-weight:800; padding:12px 22px; border-radius:999px; font-size:16px; }
+  .chips { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin:8px 0 0; padding:0; list-style:none; }
+  .chips li { background:var(--sand2); border-radius:999px; padding:6px 14px; font-size:15px; font-weight:500; }
+  .features { display:grid; gap:16px; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); margin-top:40px; }
+  .feature { background:var(--sand2); border-radius:18px; padding:20px; }
+  .feature h3 { margin:0 0 6px; font-size:19px; letter-spacing:-0.01em; }
+  .feature p { margin:0; color:var(--muted); font-size:16px; }
 </style>
 </head>
 <body><main>
-<a class="brand" href="index.html">OUTHERENOW</a>
+<a class="brand" href="index.html"><svg class="pin" width="26" height="30" viewBox="0 0 100 116" aria-hidden="true"><path d="M50 4C27 4 10 21 10 43C10 70 50 112 50 112C50 112 90 70 90 43C90 21 73 4 50 4Z" fill="#E8654A"/><path d="M67 13A10 10 0 0 1 74 25" stroke="#F2B33D" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="54" cy="24" r="7" fill="#F2B33D"/><path d="M33 87Q49 91 67 87" stroke="#FBF3E6" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M52 35L47 56M51 40L60 31L65 19M51 40L39 41L31 34M47 56L52 69L48 82M47 56L36 62L38 74" stroke="#FBF3E6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><span>out here <span class="now">now</span></span></a>
 <h1>Community Guidelines</h1>
 <p class="muted">Last updated October 2, 2026</p>
 <p>OUTHERENOW is for touching grass together. These guidelines keep it a good place to be.</p>
@@ -33,6 +59,6 @@
 <p>Use Report on the spot, camp, review, line post or profile, or long-press a person to report or block them. Blocking hides their posts from you right away.</p>
 <p>We review every report within 24 hours. Content that breaks these guidelines is removed, and accounts that post it are suspended or banned.</p>
 <p>If someone is in danger, call 911 or your local emergency number first.</p>
-<nav><a href="terms.html">Terms of Use</a> · <a href="guidelines.html">Community Guidelines</a> · <a href="privacy.html">Privacy Policy</a> · <a href="support.html">Support</a></nav>
+<nav><a href="index.html">Home</a><a href="terms.html">Terms of Use</a><a href="guidelines.html">Community Guidelines</a><a href="privacy.html">Privacy Policy</a><a href="support.html">Support</a></nav>
 </main></body>
 </html>
