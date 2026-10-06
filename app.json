@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "OUTHERENOW",
+    "name": "Out Here Now",
     "slug": "outhere",
     "scheme": "outhere",
     "version": "0.10.1",
@@ -47,21 +47,21 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "OUTHERENOW uses your approximate location to show spots near you and to send alerts about camps within your chosen radius."
+          "locationWhenInUsePermission": "Out Here Now uses your approximate location to show spots near you and to send alerts about camps within your chosen radius."
         }
       ],
       "expo-notifications",
       [
         "expo-calendar",
         {
-          "calendarPermission": "OUTHERENOW adds camps you choose to your calendar."
+          "calendarPermission": "Out Here Now adds camps you choose to your calendar."
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "OUTHERENOW uses your photos so you can add a profile picture and camp photos.",
-          "cameraPermission": "OUTHERENOW uses the camera so you can take a profile picture or camp photo.",
+          "photosPermission": "Out Here Now uses your photos so you can add a profile picture and camp photos.",
+          "cameraPermission": "Out Here Now uses the camera so you can take a profile picture or camp photo.",
           "microphonePermission": false
         }
       ]
