@@ -194,9 +194,9 @@ export default function Me() {
         {/* Share */}
         <Card>
           <Text style={type.h2}>Bring your crew</Text>
-          <Text style={type.small}>OUTHERENOW is better with more people out here. Send it to the folks you train with.</Text>
+          <Text style={type.small}>Out Here Now is better with more people out here. Send it to the folks you train with.</Text>
           <View style={{ alignSelf: 'flex-start' }}>
-            <Button title="Share OUTHERENOW" variant="ghost" onPress={() => Share.share({ message: 'Come find us on OUTHERENOW 📍 Spots, camps and who’s out right now.' })} />
+            <Button title="Share Out Here Now" variant="ghost" onPress={() => Share.share({ message: 'Come find us on Out Here Now 📍 Adventure, camps and who’s out right now. https://outherenow.app' })} />
           </View>
         </Card>
 

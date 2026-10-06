@@ -51,7 +51,7 @@ function Gate() {
       <View style={{ ...overlay, padding: space.xl, gap: space.lg }}>
         <Text style={[type.title, { textAlign: 'center' }]}>Account suspended</Text>
         <Text style={[type.body, { textAlign: 'center' }]}>
-          This account was suspended for breaking the OUTHERENOW Terms or Community Guidelines.
+          This account was suspended for breaking the Out Here Now Terms or Community Guidelines.
         </Text>
         {SUPPORT_EMAIL ? <Text style={[type.small, { textAlign: 'center' }]}>Think this is a mistake? Email {SUPPORT_EMAIL}.</Text> : null}
         <Button title="Sign out" variant="secondary" onPress={signOut} />
@@ -101,6 +101,7 @@ export default function RootLayout() {
           headerTintColor: colors.dusk,
           headerTitleStyle: { fontWeight: '800', color: colors.night },
           headerShadowVisible: false,
+          headerBackButtonDisplayMode: 'minimal', // just the arrow — never shows a route name like "(tabs)"
           contentStyle: { backgroundColor: colors.sand },
         }}
       >

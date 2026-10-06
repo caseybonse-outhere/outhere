@@ -21,17 +21,17 @@ export default function ShareScreen() {
         <View style={{ backgroundColor: colors.white, borderRadius: radius.lg, padding: space.xl, alignItems: 'center', gap: space.md, borderWidth: 1, borderColor: colors.line }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
             <PinLogo size={28} />
-            <Text style={{ fontSize: 18, fontWeight: '800', color: colors.night, letterSpacing: -0.5 }}>OUTHERENOW</Text>
+            <Text style={{ fontSize: 18, fontWeight: '800', color: colors.night, letterSpacing: -0.5 }}>out here <Text style={{ color: colors.coralDark }}>now</Text></Text>
           </View>
           <Text style={[type.h2, { textAlign: 'center' }]} numberOfLines={2}>
             {name ?? (kind === 'camp' ? 'Camp' : 'Spot')}
           </Text>
           <QRCode value={url} size={size} color={colors.night} backgroundColor={colors.white} ecl="M" />
-          <Text style={[type.small, { textAlign: 'center' }]}>Scan with your phone camera to open it in OUTHERENOW</Text>
+          <Text style={[type.small, { textAlign: 'center' }]}>Scan with your phone camera to open it in Out Here Now</Text>
         </View>
         <Text style={[type.small, { textAlign: 'center' }]}>Take a screenshot to print it for a sign at the {kind}.</Text>
         <View style={{ alignSelf: 'stretch' }}>
-          <Button title="Share link" onPress={() => shareLink(kind, id, name ?? 'OUTHERENOW')} />
+          <Button title="Share link" onPress={() => shareLink(kind, id, name ?? 'Out Here Now')} />
         </View>
       </ScrollView>
     </Screen>

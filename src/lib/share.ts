@@ -15,7 +15,7 @@ export function shareUrl(kind: ShareKind, id: string): string {
 /** Open the system share sheet with a link to a camp or spot. */
 export async function shareLink(kind: ShareKind, id: string, name: string, extra?: string) {
   const url = shareUrl(kind, id);
-  const text = [`${name} on OUTHERENOW`, extra].filter(Boolean).join(' · ');
+  const text = [`${name} on Out Here Now`, extra].filter(Boolean).join(' · ');
   // iOS shows the url as a rich link next to the message; Android only takes a message.
   await Share.share(Platform.OS === 'ios' ? { message: text, url } : { message: `${text}\n${url}` });
 }

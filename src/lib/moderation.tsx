@@ -72,10 +72,9 @@ export function ReportLink({ label, onPress }: { label: string; onPress: () => v
 export function LegalLinks({ docs = ['terms', 'guidelines', 'privacy'] }: { docs?: LegalDocId[] }) {
   const label: Record<LegalDocId, string> = { terms: 'Terms', guidelines: 'Community Guidelines', privacy: 'Privacy', support: 'Support' };
   return (
-    <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
-      {docs.map((d, i) => (
-        <View key={d} style={{ flexDirection: 'row', alignItems: 'center' }}>
-          {i > 0 && <Text style={type.small}> · </Text>}
+    <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', columnGap: space.md }}>
+      {docs.map((d) => (
+        <View key={d}>
           <Pressable accessibilityRole="link" onPress={() => router.push(`/legal/${d}`)} style={{ minHeight: 44, justifyContent: 'center', paddingHorizontal: space.xs }}>
             <Text style={[type.small, { color: colors.coralDark, fontWeight: '700' }]}>{label[d]}</Text>
           </Pressable>

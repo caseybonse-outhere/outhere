@@ -1,9 +1,9 @@
-// Supabase Edge Function: email the OUTHERENOW admin about new reports and support messages,
+// Supabase Edge Function: email the Out Here Now admin about new reports and support messages,
 // so reports get handled within 24 hours (an App Store requirement for apps with user posts).
 //  • reports INSERT          → "New report: Camp — …"
 //  • support_messages INSERT → "Support: …" (reply-to is the member's email)
 // Triggered by Database Webhooks (see README). Deploy:
-//   npx supabase secrets set RESEND_API_KEY=<re_...> ADMIN_EMAIL=<where to send> FROM_EMAIL="OUTHERENOW <alerts@yourdomain>"
+//   npx supabase secrets set RESEND_API_KEY=<re_...> ADMIN_EMAIL=<where to send> FROM_EMAIL="Out Here Now <alerts@yourdomain>"
 //   npx supabase functions deploy notify-report --no-verify-jwt
 // Uses the same WEBHOOK_SECRET as notify-nearby.
 
@@ -55,7 +55,7 @@ async function sendEmail(subject: string, html: string, replyTo?: string | null)
     method: 'POST',
     headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      from: Deno.env.get('FROM_EMAIL') ?? 'OUTHERENOW <onboarding@resend.dev>',
+      from: Deno.env.get('FROM_EMAIL') ?? 'Out Here Now <onboarding@resend.dev>',
       to: [to],
       subject,
       html,
@@ -82,7 +82,7 @@ Deno.serve(async (req) => {
         `New report: ${kind} — ${what.slice(0, 60)}`,
         `<p><b>${escape(kind)}</b> reported by ${escape(reporter.name)}${r.reason ? ` — <i>${escape(String(r.reason))}</i>` : ''}</p>
          <blockquote>${escape(what)}</blockquote>
-         <p>Open OUTHERENOW → Me → <b>Review reports</b> to remove it, ban the poster, or dismiss. Please handle it within 24 hours.</p>`,
+         <p>Open Out Here Now → Me → <b>Review reports</b> to remove it, ban the poster, or dismiss. Please handle it within 24 hours.</p>`,
       );
     } else if (payload.table === 'support_messages') {
       const from = await member(r.user_id);

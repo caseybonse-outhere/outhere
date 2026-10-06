@@ -42,8 +42,10 @@ export default function SignIn() {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.wrap}>
         <View style={styles.brand}>
           <PinLogo size={88} />
-          <Text style={styles.word} numberOfLines={1} adjustsFontSizeToFit accessibilityRole="header">OUTHERENOW</Text>
-          <Text style={[type.small, { textAlign: 'center' }]}>Spots, camps and who’s out right now — flow, slackline, acro, yoga, hiking and more.</Text>
+          <Text style={styles.word} numberOfLines={1} adjustsFontSizeToFit accessibilityRole="header">
+            out here <Text style={{ color: colors.coralDark }}>now</Text>
+          </Text>
+          <Text style={[type.body, { textAlign: 'center', color: colors.muted }]}>Adventure, camps and who’s out right now</Text>
         </View>
 
         {passwordMode ? (
@@ -93,6 +95,6 @@ export default function SignIn() {
 const styles = StyleSheet.create({
   wrap: { flex: 1, justifyContent: 'center', padding: space.xl, gap: space.xl },
   brand: { alignItems: 'center', gap: space.sm },
-  word: { fontSize: 40, fontWeight: '800', letterSpacing: -1, color: colors.night, alignSelf: 'stretch', textAlign: 'center' },
+  word: { fontSize: 44, fontWeight: '800', letterSpacing: -1.5, color: colors.night, alignSelf: 'stretch', textAlign: 'center' },
   form: { gap: space.lg },
 });

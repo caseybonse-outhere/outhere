@@ -10,7 +10,7 @@ mkdirSync(out, { recursive: true });
 const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 const contact = legal.contactEmail
   ? `Email <a href="mailto:${esc(legal.contactEmail)}">${esc(legal.contactEmail)}</a>, or use Contact support on the Me tab in the app.`
-  : 'Use Contact support on the Me tab in the OUTHERENOW app.';
+  : 'Use Contact support on the Me tab in the Out Here Now app.';
 const fill = (s) => esc(s).replace('{contact}', contact);
 
 const order = ['terms', 'guidelines', 'privacy', 'support'];

@@ -38,10 +38,10 @@ export default function Welcome() {
           <View style={{ alignItems: 'center' }}>
             <PinLogo size={72} />
           </View>
-          <Text style={[type.title, { textAlign: 'center' }]}>{returning ? 'Quick check-in' : 'Welcome to OUTHERENOW'}</Text>
+          <Text style={[type.title, { textAlign: 'center' }]}>{returning ? 'Quick check-in' : 'Welcome to Out Here Now'}</Text>
           <Text style={[type.body, { textAlign: 'center' }]}>
             {returning
-              ? 'We’ve added Terms and Community Guidelines to keep OUTHERENOW a good place to be. Please read and agree to keep going.'
+              ? 'We’ve added Terms and Community Guidelines to keep Out Here Now a good place to be. Please read and agree to keep going.'
               : 'Find spots, start camps and see who’s out right now. You can add a photo and what you do on your profile later.'}
           </Text>
 
@@ -59,7 +59,7 @@ export default function Welcome() {
 
           <View style={{ gap: space.sm }}>
             <Text style={type.small}>
-              OUTHERENOW has zero tolerance for objectionable content or abusive behavior. Posts that break the rules are removed and the people who post them are banned. You must be 18 or older.
+              Out Here Now has zero tolerance for objectionable content or abusive behavior. Posts that break the rules are removed and the people who post them are banned. You must be 18 or older.
             </Text>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
               <DocLink label="Read the Terms" doc="terms" />

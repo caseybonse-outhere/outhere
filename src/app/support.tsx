@@ -8,7 +8,7 @@ import { supabase } from '../lib/supabase';
 import { space, type } from '../lib/theme';
 import { Button, Field, Screen } from '../lib/ui';
 
-/** Send a message to the OUTHERENOW team (emailed to the admin by the notify-report function). */
+/** Send a message to the Out Here Now team (emailed to the admin by the notify-report function). */
 export default function Support() {
   const { profile } = useAuth();
   const [body, setBody] = useState('');

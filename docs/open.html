@@ -29,9 +29,9 @@
   <p class="small">Adventure, camps and who’s out right now</p>
   <div class="card">
     <h1 id="title">Open in the app</h1>
-    <p id="lead">Someone shared this with you on OUTHERENOW.</p>
-    <a class="btn" id="open" href="outhere://">Open in OUTHERENOW</a>
-    <a class="btn ghost" id="get" href="index.html">Get OUTHERENOW</a>
+    <p id="lead">Someone shared this with you on Out Here Now.</p>
+    <a class="btn" id="open" href="outhere://">Open in Out Here Now</a>
+    <a class="btn ghost" id="get" href="index.html">Get Out Here Now</a>
     <p class="small" id="note">Don’t have the app yet? It’s coming soon to the App Store for iPhone.</p>
   </div>
 </main>
@@ -45,7 +45,7 @@
   if (kind && id && uuid.test(id)) {
     document.getElementById('open').href = 'outhere://' + kind + '/' + id;
     document.getElementById('title').textContent = kind === 'camp' ? 'Someone shared a camp' : 'Someone shared a spot';
-    document.getElementById('lead').textContent = 'Open it in OUTHERENOW to see when it’s on, who’s going and where to meet.';
+    document.getElementById('lead').textContent = 'Open it in Out Here Now to see when it’s on, who’s going and where to meet.';
   }
   if (APP_STORE_URL) {
     document.getElementById('get').href = APP_STORE_URL;
