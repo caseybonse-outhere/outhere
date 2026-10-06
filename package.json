@@ -45,7 +45,8 @@
     "typecheck": "tsc --noEmit",
     "share": "npx eas-cli@latest update --channel main --platform ios --environment production --message \"OUTHERENOW update\"",
     "lint": "expo lint",
-    "legal": "node scripts/build-legal.mjs"
+    "legal": "node scripts/build-legal.mjs",
+    "share:testflight": "npx eas-cli@latest update --channel production --platform ios --environment production --message \"Out Here Now update\""
   },
   "private": true
 }

@@ -2,7 +2,7 @@ import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router
 import { useCallback, useMemo, useState } from 'react';
 import { Alert, Linking, Pressable, ScrollView, Text, View } from 'react-native';
 import { useAuth } from '../../lib/auth';
-import { useOnJamsChanged } from '../../lib/events';
+import { emitJamsChanged, useOnJamsChanged } from '../../lib/events';
 import { Avatar } from '../../lib/avatar';
 import { addJamToCalendar } from '../../lib/calendar';
 import { fetchActiveLines, fetchActiveSessions, fetchEvents, fetchReviews } from '../../lib/data';
@@ -73,6 +73,26 @@ export default function SpotScreen() {
     );
   }
   const s = spot;
+
+  function confirmDelete() {
+    const n = events.length;
+    const extra = n > 0 ? ` Its ${n} ${n === 1 ? 'camp' : 'camps'}, reviews, check-ins and lines will be deleted too.` : ' Its reviews, check-ins and lines will be deleted too.';
+    Alert.alert(`Delete ${s.name}?`, `This removes the spot for everyone and can’t be undone.${extra}`, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          const { data, error } = await supabase.from('spots').delete().eq('id', s.id).select('id');
+          if (error) return Alert.alert('Couldn’t delete spot', error.message);
+          if (!data || data.length === 0) return Alert.alert('Couldn’t delete spot', 'Only the person who added it or an admin can delete this spot.');
+          emitJamsChanged();
+          if (router.canGoBack()) router.back();
+          else router.replace('/');
+        },
+      },
+    ]);
+  }
   // "The line is up" applies when the spot or any jam here is a slackline thing.
   const slackliney = s.disciplines.includes(SLACKLINE) || events.some((e) => e.disciplines.includes(SLACKLINE)) || lines.length > 0;
 
@@ -256,6 +276,7 @@ export default function SpotScreen() {
           </View>
         </View>
         {s.created_by !== profile.id && <ReportLink label="Report this spot" onPress={() => reportContent(profile.id, 'spot', s.id, 'spot')} />}
+        {(s.created_by === profile.id || profile.is_admin) && <Button title="Delete spot" variant="danger" onPress={confirmDelete} />}
       </ScrollView>
     </Screen>
   );
