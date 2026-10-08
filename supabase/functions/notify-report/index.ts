@@ -44,7 +44,10 @@ async function preview(type: string, id: string): Promise<string> {
     : type === 'profile' ? await pick('profiles', 'display_name, bio, avatar_url')
     : null;
   if (!row) return '(already removed)';
-  return Object.values(row).filter((v) => v != null && v !== '').join(' — ');
+  // Leave out photo links: raw URLs in the email make Gmail more likely to file it as spam.
+  const text = Object.values(row).filter((v) => v != null && v !== '' && !/^https?:\/\//.test(String(v)));
+  const hasPhoto = Object.values(row).some((v) => /^https?:\/\//.test(String(v ?? '')));
+  return [...text, ...(hasPhoto ? ['(has a photo — open the app to see it)'] : [])].join(' — ') || '(no text)';
 }
 
 async function sendEmail(subject: string, html: string, replyTo?: string | null) {
