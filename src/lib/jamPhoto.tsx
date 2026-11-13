@@ -13,6 +13,9 @@ const ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
   Parkour: 'walk',
   Juggling: 'ellipse',
   'Rings & Gymnastics': 'fitness',
+  'Rock Climbing': 'triangle',
+  'Martial Arts': 'hand-left',
+  Kickball: 'football',
 };
 
 /** Jam cover photo, or a branded placeholder showing the jam's main discipline. */

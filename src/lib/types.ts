@@ -8,6 +8,9 @@ export const DISCIPLINES = [
   'Juggling',
   'Yoga',
   'Hiking',
+  'Rock Climbing',
+  'Martial Arts',
+  'Kickball',
 ] as const;
 export type Discipline = (typeof DISCIPLINES)[number];
 
