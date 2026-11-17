@@ -57,7 +57,7 @@ function page(title, body, { home = false } = {}) {
   .lockup .words { font-weight:800; font-size:clamp(48px, 13vw, 76px); line-height:.92; letter-spacing:-0.035em; }
   .lockup .pin { width:clamp(72px, 18vw, 112px); height:auto; flex:none; }
   .tagline { font-size:clamp(18px, 4.6vw, 22px); font-weight:500; color:var(--muted); margin:0; }
-  .soon { display:inline-block; background:var(--dusk); color:var(--sand); font-weight:800; padding:12px 22px; border-radius:999px; font-size:16px; }
+  .soon { display:inline-block; text-decoration:none; background:var(--dusk); color:var(--sand); font-weight:800; padding:12px 22px; border-radius:999px; font-size:16px; }
   .chips { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin:8px 0 0; padding:0; list-style:none; }
   .chips li { background:var(--sand2); border-radius:999px; padding:6px 14px; font-size:15px; font-weight:500; }
   .features { display:grid; gap:16px; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); margin-top:40px; }
@@ -91,9 +91,9 @@ writeFileSync(
     `<section class="hero">
   <div class="lockup">${pin(112)}<div class="words">out here<br><span class="now">now</span>${dot}</div></div>
   <p class="tagline">${TAGLINE}</p>
-  <span class="soon">Coming soon to the App Store</span>
+  <a class="soon" href="https://apps.apple.com/app/id6819541479">Get it on the App Store</a>
 </section>
-<p style="text-align:center">A free iPhone app for the movement arts community. Find the spots, join the camps, and see who’s out here now.</p>
+<p style="text-align:center">A free app for the movement arts community. Find the spots, join the camps, and see who’s out here now.</p>
 <ul class="chips">${activities.map((a) => `<li>${a}</li>`).join('')}</ul>
 <section class="features">
   <div class="feature"><h3>Spots</h3><p>Parks, beaches and trails on a map, with what’s there and honest reviews from people who train there.</p></div>
@@ -102,6 +102,24 @@ writeFileSync(
 </section>
 <p class="muted" style="text-align:center;margin-top:40px">${contact}</p>`,
     { home: true },
+  ),
+);
+// Google Play requires a web page explaining how to delete your account and what gets deleted.
+writeFileSync(
+  new URL('delete-account.html', out),
+  page(
+    'Delete your account',
+    `<h1>Delete your Out Here Now account</h1>
+<p>You can delete your account and its data at any time.</p>
+<h2>In the app</h2>
+<p>Open Out Here Now, go to the <b>Me</b> tab, tap <b>Delete account</b> and confirm. Deletion happens right away.</p>
+<h2>Without the app</h2>
+<p>Email <a href="mailto:${esc(legal.contactEmail)}?subject=Delete%20my%20account">${esc(legal.contactEmail)}</a> from the email address you sign in with and ask us to delete your account. We delete it within 7 days and reply to confirm.</p>
+<h2>What is deleted</h2>
+<p>Your account and email address, profile (name, photo, bio, activities, interests), reviews, check-ins, line posts, camp memberships, “I’m going” RSVPs, the camps you started, your saved rough area and your device’s push token. Reports and blocks you filed are removed with your account.</p>
+<h2>What is kept</h2>
+<p>Spots you added stay on the map for the community, without your name. Nothing else is kept.</p>
+<p class="muted">${contact}</p>`,
   ),
 );
 writeFileSync(new URL('.nojekyll', out), '');
