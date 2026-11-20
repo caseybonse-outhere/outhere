@@ -1,6 +1,7 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, Linking, Pressable, ScrollView, Share, Switch, Text, View } from 'react-native';
+import { ActivityDetails, keepDetails } from '../../lib/activities';
 import { useAuth } from '../../lib/auth';
 import { Avatar, pickAndUploadAvatar } from '../../lib/avatar';
 import { fetchOpenReports } from '../../lib/data';
@@ -23,6 +24,7 @@ export default function Me() {
   const [name, setName] = useState('');
   const [bio, setBio] = useState('');
   const [disciplines, setDisciplines] = useState<string[]>([]);
+  const [details, setDetails] = useState<string[]>([]);
   const [interests, setInterests] = useState<string[]>([]);
 
   const [pushOn, setPushOn] = useState(true);
@@ -43,23 +45,27 @@ export default function Me() {
   );
 
   // Copy the saved profile into the form whenever it changes (adjusting state during render, per React docs).
-  const savedSig = profile ? JSON.stringify([profile.id, profile.display_name, profile.bio, profile.disciplines, profile.interests]) : '';
+  const savedSig = profile ? JSON.stringify([profile.id, profile.display_name, profile.bio, profile.disciplines, profile.discipline_details, profile.interests]) : '';
   const [syncedSig, setSyncedSig] = useState('');
   if (profile && savedSig !== syncedSig) {
     setSyncedSig(savedSig);
     setName(profile.display_name);
     setBio(profile.bio ?? '');
     setDisciplines(profile.disciplines ?? []);
+    setDetails(profile.discipline_details ?? []);
     setInterests(profile.interests ?? []);
   }
 
 
   if (!profile) return null;
 
+  // Details only count for activities that are still picked.
+  const keptDetails = keepDetails(details, disciplines);
   const dirty =
     name.trim() !== profile.display_name ||
     bio.trim() !== (profile.bio ?? '') ||
     disciplines.join('|') !== (profile.disciplines ?? []).join('|') ||
+    keptDetails.join('|') !== (profile.discipline_details ?? []).join('|') ||
     interests.join('|') !== (profile.interests ?? []).join('|');
 
   async function update(fields: Partial<Profile>) {
@@ -71,7 +77,7 @@ export default function Me() {
   async function saveProfile() {
     if (!name.trim()) return Alert.alert('Add a name', 'People need something to call you.');
     setSaving(true);
-    await update({ display_name: name.trim(), bio: bio.trim() || null, disciplines, interests });
+    await update({ display_name: name.trim(), bio: bio.trim() || null, disciplines, discipline_details: keptDetails, interests });
     setSaving(false);
   }
 
@@ -147,6 +153,9 @@ export default function Me() {
           <Field label="About you" value={bio} onChangeText={setBio} multiline maxLength={280} placeholder="What you spin, where you train, what you’re working on…" />
           <Text style={type.label}>What I do</Text>
           <ChipGroup options={DISCIPLINES} value={disciplines} onChange={setDisciplines} />
+          {disciplines.map((d) => (
+            <ActivityDetails key={d} activity={d} tags={details} onChange={setDetails} />
+          ))}
           <Text style={type.label}>I’m into</Text>
           <ChipGroup options={INTERESTS} value={interests} onChange={setInterests} />
           <Button title={dirty ? 'Save profile' : 'Saved'} onPress={saveProfile} loading={saving} disabled={!dirty} />

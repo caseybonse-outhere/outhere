@@ -6,6 +6,7 @@ import { Avatar } from '../../lib/avatar';
 import { blockPerson, reportContent } from '../../lib/moderation';
 import { supabase } from '../../lib/supabase';
 import { space, type } from '../../lib/theme';
+import { describeActivity } from '../../lib/activities';
 import { PUBLIC_PROFILE_COLUMNS, type PublicProfile } from '../../lib/types';
 import { Button, Card, Chip, Empty, Screen } from '../../lib/ui';
 
@@ -59,7 +60,7 @@ export default function ProfileScreen() {
             <Text style={type.label}>What they do</Text>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.xs }}>
               {person.disciplines.map((d) => (
-                <Chip key={d} label={d} />
+                <Chip key={d} label={describeActivity(d, person.discipline_details)} />
               ))}
             </View>
           </Card>

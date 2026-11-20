@@ -5,9 +5,14 @@ import type { JamEvent } from './types';
 
 const ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
   Slackline: 'remove-outline',
-  'Flow Arts': 'sparkles',
+  Poi: 'sparkles',
+  'Rope Dart': 'flash',
+  'Pixel Whip': 'color-wand',
+  Staff: 'reorder-two',
+  Hoops: 'ellipse-outline',
+  Flowstar: 'star',
   Dance: 'musical-notes',
-  Acro: 'people',
+  AcroYoga: 'people',
   Yoga: 'leaf',
   Hiking: 'trail-sign',
   Parkour: 'walk',

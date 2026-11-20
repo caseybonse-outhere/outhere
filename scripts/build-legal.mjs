@@ -83,7 +83,7 @@ for (const id of order) {
   writeFileSync(new URL(`${id}.html`, out), page(d.title, `<h1>${esc(d.title)}</h1>\n<p class="muted">Last updated ${esc(legal.updated)}</p>\n<p>${fill(d.intro)}</p>\n${sections}`));
 }
 
-const activities = ['Flow arts', 'Slackline', 'Acro', 'Parkour', 'Rings & gymnastics', 'Dance', 'Juggling', 'Yoga', 'Hiking', 'Rock climbing', 'Martial arts', 'Kickball'];
+const activities = ['Poi', 'Rope dart', 'Pixel whip', 'Staff', 'Hoops', 'Flowstar', 'Juggling', 'Slackline', 'AcroYoga', 'Parkour', 'Rings & gymnastics', 'Dance', 'Yoga', 'Hiking', 'Rock climbing', 'Martial arts', 'Kickball'];
 writeFileSync(
   new URL('index.html', out),
   page(

@@ -1,6 +1,7 @@
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 import { Alert, Linking, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityDetails, describeActivity, detailsFor } from '../../lib/activities';
 import { useAuth } from '../../lib/auth';
 import { emitJamsChanged, useOnJamsChanged } from '../../lib/events';
 import { Avatar } from '../../lib/avatar';
@@ -13,7 +14,7 @@ import { shareLink, showQr } from '../../lib/share';
 import { describeSchedule, formatTime, formatWhen, nextOccurrence, sunsetToday } from '../../lib/schedule';
 import { supabase } from '../../lib/supabase';
 import { colors, space, type } from '../../lib/theme';
-import { MUSIC_LABEL, SLACKLINE, type JamEvent, type Line, type Review, type Session, type Spot } from '../../lib/types';
+import { DISCIPLINES, MUSIC_LABEL, SLACKLINE, type JamEvent, type Line, type Review, type Session, type Spot } from '../../lib/types';
 import { Button, Card, Chip, Empty, Field, Screen, Segmented } from '../../lib/ui';
 
 const FIRE_LABEL = { yes: 'Fire OK', no: 'No fire', permit: 'Fire with permit', unknown: 'Fire rules unknown' };
@@ -31,6 +32,7 @@ export default function SpotScreen() {
   const [lines, setLines] = useState<Line[]>([]);
   const [checkingIn, setCheckingIn] = useState(false);
   const [activity, setActivity] = useState<string | null>(null);
+  const [details, setDetails] = useState<string[]>([]);
   const [until, setUntil] = useState<Until>('2h');
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState('');
@@ -96,6 +98,18 @@ export default function SpotScreen() {
   // "The line is up" applies when the spot or any jam here is a slackline thing.
   const slackliney = s.disciplines.includes(SLACKLINE) || events.some((e) => e.disciplines.includes(SLACKLINE)) || lines.length > 0;
 
+  // What you can say you're doing: the spot's activities plus your own, in the usual order.
+  const doingOptions = [
+    ...DISCIPLINES.filter((d) => s.disciplines.includes(d) || profile!.disciplines.includes(d)),
+    ...s.disciplines.filter((d) => !(DISCIPLINES as readonly string[]).includes(d)),
+  ];
+
+  // Start from the details on your profile (e.g. Juggling: Clubs); you can change them for this check-in.
+  function pickActivity(a: string) {
+    setActivity(a);
+    setDetails((profile!.discipline_details ?? []).filter((t) => detailsFor(a, [t]).length > 0));
+  }
+
   async function checkIn() {
     const now = new Date();
     const hours = { '1h': 1, '2h': 2, '3h': 3 } as const;
@@ -105,6 +119,7 @@ export default function SpotScreen() {
       user_id: profile!.id,
       spot_id: s.id,
       activity,
+      details: activity ? details.filter((t) => detailsFor(activity, [t]).length > 0) : [],
       ends_at: ends.toISOString(),
     });
     if (error) return Alert.alert('Couldn’t check in', error.message);
@@ -164,7 +179,7 @@ export default function SpotScreen() {
                 <Avatar url={x.profile?.avatar_url} name={x.profile?.display_name} size={36} />
                 <Text style={[type.body, { flex: 1 }]}>
                   <Text style={{ fontWeight: '700' }}>{x.profile?.display_name ?? 'Someone'}</Text>
-                  {x.activity ? ` · ${x.activity}` : ''} · until {formatTime(new Date(x.ends_at))}
+                  {x.activity ? ` · ${describeActivity(x.activity, x.details)}` : ''} · until {formatTime(new Date(x.ends_at))}
                 </Text>
               </Pressable>
             ))
@@ -174,7 +189,8 @@ export default function SpotScreen() {
           ) : checkingIn ? (
             <View style={{ gap: space.md }}>
               <Text style={type.label}>Doing</Text>
-              <Segmented options={s.disciplines.map((d) => ({ label: d, value: d }))} value={activity ?? ''} onChange={(v) => setActivity(v)} />
+              <Segmented options={doingOptions.map((d) => ({ label: d, value: d }))} value={activity ?? ''} onChange={pickActivity} />
+              {activity && <ActivityDetails activity={activity} tags={details} onChange={setDetails} />}
               <Text style={type.label}>Until</Text>
               <Segmented<Until>
                 options={[

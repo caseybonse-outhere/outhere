@@ -1,11 +1,16 @@
 export const DISCIPLINES = [
-  'Flow Arts',
+  'Poi',
+  'Rope Dart',
+  'Pixel Whip',
+  'Staff',
+  'Hoops',
+  'Flowstar',
+  'Juggling',
   'Slackline',
-  'Acro',
+  'AcroYoga',
   'Parkour',
   'Rings & Gymnastics',
   'Dance',
-  'Juggling',
   'Yoga',
   'Hiking',
   'Rock Climbing',
@@ -13,6 +18,15 @@ export const DISCIPLINES = [
   'Kickball',
 ] as const;
 export type Discipline = (typeof DISCIPLINES)[number];
+
+/**
+ * Optional details for some activities. Saved as "Activity: Option" tags
+ * (e.g. "Juggling: Clubs") in profiles.discipline_details and sessions.details.
+ */
+export const DISCIPLINE_DETAILS: Partial<Record<Discipline, readonly string[]>> = {
+  Juggling: ['Balls', 'Clubs', 'Wants to pass'],
+  Staff: ['Dragon staff'],
+};
 
 /** Things people are into beyond what they practice. */
 export const INTERESTS = [
@@ -42,6 +56,8 @@ export type Profile = {
   id: string;
   display_name: string;
   disciplines: string[];
+  /** "Juggling: Clubs" style tags, see DISCIPLINE_DETAILS. */
+  discipline_details: string[];
   bio: string | null;
   interests: string[];
   avatar_url: string | null;
@@ -105,6 +121,8 @@ export type Session = {
   user_id: string;
   spot_id: string;
   activity: string | null;
+  /** "Juggling: Clubs" style tags for the activity, see DISCIPLINE_DETAILS. */
+  details: string[];
   note: string | null;
   starts_at: string;
   ends_at: string;
@@ -123,8 +141,8 @@ export type Review = {
 
 
 /** What any member can see about another member. */
-export type PublicProfile = Pick<Profile, 'id' | 'display_name' | 'disciplines' | 'interests' | 'bio' | 'avatar_url' | 'created_at'>;
-export const PUBLIC_PROFILE_COLUMNS = 'id, display_name, disciplines, interests, bio, avatar_url, created_at';
+export type PublicProfile = Pick<Profile, 'id' | 'display_name' | 'disciplines' | 'discipline_details' | 'interests' | 'bio' | 'avatar_url' | 'created_at'>;
+export const PUBLIC_PROFILE_COLUMNS = 'id, display_name, disciplines, discipline_details, interests, bio, avatar_url, created_at';
 
 export type LineType = 'slackline' | 'trickline' | 'longline' | 'highline' | 'waterline' | 'rodeo';
 export const LINE_TYPE_LABEL: Record<LineType, string> = {
