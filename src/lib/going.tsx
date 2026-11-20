@@ -6,7 +6,7 @@ import { Avatar } from './avatar';
 import { setGoing } from './data';
 import { dayLabel, localDate, type Occurrence } from './schedule';
 import { colors, radius, space, type } from './theme';
-import type { Rsvp } from './types';
+import type { Rsvp, Visibility } from './types';
 import { Button, Card } from './ui';
 
 /** Sign-ups for one camp's next session. */
@@ -46,12 +46,15 @@ export function GoingSection({
   occ,
   userId,
   going,
+  visibility,
   onChange,
 }: {
   eventId: string;
   occ: Occurrence;
   userId: string;
   going: Rsvp[];
+  /** Who sees your "I'm going" (your default from the Me tab). */
+  visibility: Visibility;
   onChange: () => void;
 }) {
   const [busy, setBusy] = useState(false);
@@ -61,7 +64,7 @@ export function GoingSection({
 
   async function toggle() {
     setBusy(true);
-    const { error } = await setGoing(eventId, userId, localDate(occ.start), !mine);
+    const { error } = await setGoing(eventId, userId, localDate(occ.start), !mine, visibility);
     setBusy(false);
     if (error && error.code !== '23505') return Alert.alert('Couldn’t update', error.message);
     onChange();
@@ -76,21 +79,27 @@ export function GoingSection({
         <Text style={type.small}>No one has said they’re coming yet. Be the first so people know it’s on.</Text>
       ) : (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
-          {going.map((r) => (
+          {going.map((r, i) => (
             <Pressable
-              key={r.user_id}
+              key={r.user_id ?? `anon-${i}`}
               accessibilityRole="button"
-              accessibilityLabel={r.profile?.display_name ?? 'Member'}
-              onPress={() => router.push(`/profile/${r.user_id}`)}
+              accessibilityLabel={r.profile?.display_name ?? 'Someone'}
+              disabled={!r.user_id}
+              onPress={() => r.user_id && router.push(`/profile/${r.user_id}`)}
               style={{ alignItems: 'center', width: 64, gap: 2 }}
             >
               <Avatar url={r.profile?.avatar_url} name={r.profile?.display_name} size={44} />
               <Text style={[type.small, { fontSize: 12 }]} numberOfLines={1}>
-                {r.user_id === userId ? 'You' : r.profile?.display_name ?? 'Member'}
+                {r.user_id === userId ? 'You' : r.profile?.display_name ?? 'Someone'}
               </Text>
             </Pressable>
           ))}
         </View>
+      )}
+      {!mine && visibility !== 'everyone' && (
+        <Text style={type.small}>
+          {visibility === 'friends' ? 'Only your friends will see you’re going.' : 'Others will see “someone” is going, not who.'} Change this on the Me tab.
+        </Text>
       )}
       <Button
         title={mine ? 'You’re going ✓  Can’t make it?' : `I’m going ${day}`}

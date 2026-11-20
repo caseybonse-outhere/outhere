@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 import { localDate } from './schedule';
-import type { JamEvent, JamMember, Line, OpenReport, ReportTarget, Review, Rsvp, Session, Spot } from './types';
+import type { JamEvent, JamMember, Line, OpenReport, ReportTarget, Review, Rsvp, Session, Spot, Visibility } from './types';
 
 export async function fetchSpots(): Promise<Spot[]> {
   const { data, error } = await supabase.from('spots').select('*').order('name');
@@ -8,17 +8,17 @@ export async function fetchSpots(): Promise<Spot[]> {
   return (data ?? []) as Spot[];
 }
 
+type SessionRow = Omit<Session, 'profile'> & { display_name: string | null; avatar_url: string | null };
+
+/** Who's out now, through active_sessions(): friends-only check-ins you may not see are left out, anonymous ones have no name. */
 export async function fetchActiveSessions(spotId?: string): Promise<Session[]> {
-  let q = supabase
-    .from('sessions')
-    .select('*, profile:profiles(display_name, avatar_url)')
-    .gt('ends_at', new Date().toISOString())
-    .lte('starts_at', new Date().toISOString())
-    .order('starts_at', { ascending: false });
-  if (spotId) q = q.eq('spot_id', spotId);
-  const { data, error } = await q;
+  const { data, error } = await supabase.rpc('active_sessions', spotId ? { p_spot: spotId } : {});
   if (error) throw error;
-  return (data ?? []) as Session[];
+  return ((data ?? []) as SessionRow[]).map(({ display_name, avatar_url, ...s }) => ({
+    ...s,
+    details: s.details ?? [],
+    profile: display_name ? { display_name, avatar_url } : undefined,
+  }));
 }
 
 const EVENT_SPOT = 'spot:spots(id, name, lat, lng, address, disciplines)';
@@ -92,25 +92,23 @@ export async function fetchMyJamIds(userId: string): Promise<Set<string>> {
   return new Set((data ?? []).map((r: { event_id: string }) => r.event_id));
 }
 
-/** Everyone going to upcoming camp sessions (yesterday through the next two weeks). */
+type RsvpRow = Omit<Rsvp, 'profile'> & { display_name: string | null; avatar_url: string | null };
+
+/** Everyone going to upcoming camp sessions (yesterday through the next two weeks), with the same visibility rules as check-ins. */
 export async function fetchUpcomingRsvps(eventId?: string): Promise<Rsvp[]> {
   const now = new Date();
   const from = localDate(new Date(now.getTime() - 86400000));
   const to = localDate(new Date(now.getTime() + 15 * 86400000));
-  let q = supabase
-    .from('camp_rsvps')
-    .select('event_id, user_id, occurs_on, profile:profiles(display_name, avatar_url)')
-    .gte('occurs_on', from)
-    .lte('occurs_on', to)
-    .order('created_at');
-  if (eventId) q = q.eq('event_id', eventId);
-  const { data, error } = await q;
+  const { data, error } = await supabase.rpc('upcoming_rsvps', { p_from: from, p_to: to, ...(eventId ? { p_event: eventId } : {}) });
   if (error) throw error;
-  return (data ?? []) as unknown as Rsvp[];
+  return ((data ?? []) as RsvpRow[]).map(({ display_name, avatar_url, ...r }) => ({
+    ...r,
+    profile: display_name ? { display_name, avatar_url } : undefined,
+  }));
 }
 
-export async function setGoing(eventId: string, userId: string, occursOn: string, going: boolean) {
+export async function setGoing(eventId: string, userId: string, occursOn: string, going: boolean, visibility: Visibility = 'everyone') {
   return going
-    ? supabase.from('camp_rsvps').insert({ event_id: eventId, user_id: userId, occurs_on: occursOn })
+    ? supabase.from('camp_rsvps').insert({ event_id: eventId, user_id: userId, occurs_on: occursOn, visibility })
     : supabase.from('camp_rsvps').delete().eq('event_id', eventId).eq('user_id', userId).eq('occurs_on', occursOn);
 }

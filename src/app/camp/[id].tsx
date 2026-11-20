@@ -135,7 +135,7 @@ export default function CampScreen() {
           )}
         </View>
 
-        {occ && <GoingSection eventId={jam.id} occ={occ} userId={profile.id} going={goingFor(rsvps, jam.id, occ)} onChange={() => { load().catch(() => {}); emitJamsChanged(); }} />}
+        {occ && <GoingSection eventId={jam.id} occ={occ} userId={profile.id} going={goingFor(rsvps, jam.id, occ)} visibility={profile.checkin_visibility ?? 'everyone'} onChange={() => { load().catch(() => {}); emitJamsChanged(); }} />}
 
         {jam.description ? (
           <Card>

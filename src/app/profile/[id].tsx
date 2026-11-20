@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { useAuth } from '../../lib/auth';
 import { Avatar } from '../../lib/avatar';
+import { FriendButton } from '../../lib/friends';
 import { blockPerson, reportContent } from '../../lib/moderation';
 import { supabase } from '../../lib/supabase';
 import { space, type } from '../../lib/theme';
@@ -48,6 +49,12 @@ export default function ProfileScreen() {
           <Text style={type.title}>{person.display_name}</Text>
           <Text style={type.small}>Out here since {since}</Text>
         </View>
+
+        {!isMe && me && (
+          <View style={{ gap: space.sm }}>
+            <FriendButton me={me.id} other={person.id} name={person.display_name} />
+          </View>
+        )}
 
         {person.bio ? (
           <Card>

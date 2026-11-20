@@ -5,12 +5,13 @@ import { ActivityDetails, keepDetails } from '../../lib/activities';
 import { useAuth } from '../../lib/auth';
 import { Avatar, pickAndUploadAvatar } from '../../lib/avatar';
 import { fetchOpenReports } from '../../lib/data';
+import { fetchFriendLists } from '../../lib/friends';
 import { notificationsAllowed, registerForPush, syncHomeArea } from '../../lib/device';
 import { deleteMyFiles } from '../../lib/images';
 import { LegalLinks } from '../../lib/moderation';
 import { supabase } from '../../lib/supabase';
 import { colors, space, type } from '../../lib/theme';
-import { DISCIPLINES, INTERESTS, type Profile } from '../../lib/types';
+import { DISCIPLINES, INTERESTS, VISIBILITY_OPTIONS, type Profile, type Visibility } from '../../lib/types';
 import { Button, Card, ChipGroup, Field, Screen, Segmented } from '../../lib/ui';
 
 const RADII = [1, 5, 10, 25, 50];
@@ -42,6 +43,18 @@ export default function Me() {
         .then((r) => setOpenReports(r.length))
         .catch(() => setOpenReports(null));
     }, [isAdmin]),
+  );
+
+  // Friend requests waiting for an answer.
+  const myId = profile?.id;
+  const [pendingRequests, setPendingRequests] = useState(0);
+  useFocusEffect(
+    useCallback(() => {
+      if (!myId) return;
+      fetchFriendLists(myId)
+        .then((l) => setPendingRequests(l.incoming.length))
+        .catch(() => {});
+    }, [myId]),
   );
 
   // Copy the saved profile into the form whenever it changes (adjusting state during render, per React docs).
@@ -91,6 +104,10 @@ export default function Me() {
     } finally {
       setUploading(false);
     }
+  }
+
+  async function setVisibility(v: Visibility) {
+    await update({ checkin_visibility: v });
   }
 
   async function toggleAlerts(on: boolean) {
@@ -159,6 +176,25 @@ export default function Me() {
           <Text style={type.label}>I’m into</Text>
           <ChipGroup options={INTERESTS} value={interests} onChange={setInterests} />
           <Button title={dirty ? 'Save profile' : 'Saved'} onPress={saveProfile} loading={saving} disabled={!dirty} />
+        </Card>
+
+        {/* Friends & privacy */}
+        <Card>
+          <Text style={type.h2}>Friends & privacy</Text>
+          <Text style={type.label}>Who sees my check-ins and “I’m going”</Text>
+          <Segmented<Visibility>
+            options={VISIBILITY_OPTIONS.map((o) => ({ label: o.label, value: o.value }))}
+            value={profile.checkin_visibility ?? 'everyone'}
+            onChange={setVisibility}
+          />
+          <Text style={type.small}>
+            {VISIBILITY_OPTIONS.find((o) => o.value === (profile.checkin_visibility ?? 'everyone'))?.help} You can change it each time you check in.
+          </Text>
+          <Button
+            title={pendingRequests > 0 ? `Friends · ${pendingRequests} new request${pendingRequests === 1 ? '' : 's'}` : 'Friends'}
+            variant="secondary"
+            onPress={() => router.push('/friends')}
+          />
         </Card>
 
         {/* Alerts */}

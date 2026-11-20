@@ -14,7 +14,7 @@ import { shareLink, showQr } from '../../lib/share';
 import { describeSchedule, formatTime, formatWhen, nextOccurrence, sunsetToday } from '../../lib/schedule';
 import { supabase } from '../../lib/supabase';
 import { colors, space, type } from '../../lib/theme';
-import { DISCIPLINES, MUSIC_LABEL, SLACKLINE, type JamEvent, type Line, type Review, type Session, type Spot } from '../../lib/types';
+import { DISCIPLINES, MUSIC_LABEL, SLACKLINE, VISIBILITY_OPTIONS, type Visibility, type JamEvent, type Line, type Review, type Session, type Spot } from '../../lib/types';
 import { Button, Card, Chip, Empty, Field, Screen, Segmented } from '../../lib/ui';
 
 const FIRE_LABEL = { yes: 'Fire OK', no: 'No fire', permit: 'Fire with permit', unknown: 'Fire rules unknown' };
@@ -34,6 +34,7 @@ export default function SpotScreen() {
   const [activity, setActivity] = useState<string | null>(null);
   const [details, setDetails] = useState<string[]>([]);
   const [until, setUntil] = useState<Until>('2h');
+  const [visibility, setVisibility] = useState<Visibility>('everyone');
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState('');
 
@@ -121,6 +122,7 @@ export default function SpotScreen() {
       activity,
       details: activity ? details.filter((t) => detailsFor(activity, [t]).length > 0) : [],
       ends_at: ends.toISOString(),
+      visibility,
     });
     if (error) return Alert.alert('Couldn’t check in', error.message);
     setCheckingIn(false);
@@ -141,7 +143,7 @@ export default function SpotScreen() {
     load();
   }
 
-  function moderate(kind: 'review' | 'session', targetId: string, userId: string, name?: string) {
+  function moderate(kind: 'review' | 'session', targetId: string, userId: string | null, name?: string) {
     postMenu({ me: profile!.id, ownerId: userId, ownerName: name, targetType: kind, targetId, what: kind === 'review' ? 'review' : 'check-in', onBlocked: load });
   }
 
@@ -172,7 +174,7 @@ export default function SpotScreen() {
               <Pressable
                 key={x.id}
                 accessibilityRole="button"
-                onPress={() => router.push(`/profile/${x.user_id}`)}
+                onPress={() => x.user_id && router.push(`/profile/${x.user_id}`)}
                 onLongPress={() => x.user_id !== profile.id && moderate('session', x.id, x.user_id, x.profile?.display_name)}
                 style={{ minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: space.md }}
               >
@@ -180,6 +182,9 @@ export default function SpotScreen() {
                 <Text style={[type.body, { flex: 1 }]}>
                   <Text style={{ fontWeight: '700' }}>{x.profile?.display_name ?? 'Someone'}</Text>
                   {x.activity ? ` · ${describeActivity(x.activity, x.details)}` : ''} · until {formatTime(new Date(x.ends_at))}
+                  {x.user_id === profile.id && x.visibility !== 'everyone' ? (
+                    <Text style={type.small}>{x.visibility === 'friends' ? '  · friends only' : '  · shown as “someone”'}</Text>
+                  ) : null}
                 </Text>
               </Pressable>
             ))
@@ -202,10 +207,19 @@ export default function SpotScreen() {
                 value={until}
                 onChange={setUntil}
               />
+              <Text style={type.label}>Who can see this</Text>
+              <Segmented<Visibility> options={VISIBILITY_OPTIONS.map((o) => ({ label: o.label, value: o.value }))} value={visibility} onChange={setVisibility} />
+              <Text style={type.small}>{VISIBILITY_OPTIONS.find((o) => o.value === visibility)?.help}</Text>
               <Button title="I’m out here" onPress={checkIn} />
             </View>
           ) : (
-            <Button title="I’m out here" onPress={() => setCheckingIn(true)} />
+            <Button
+              title="I’m out here"
+              onPress={() => {
+                setVisibility(profile.checkin_visibility ?? 'everyone');
+                setCheckingIn(true);
+              }}
+            />
           )}
         </Card>
 

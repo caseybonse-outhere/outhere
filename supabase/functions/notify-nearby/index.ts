@@ -1,4 +1,4 @@
-// Supabase Edge Function: push notifications for Out Here.
+// Supabase Edge Function: push notifications for Out Here Now.
 //  • events / sessions / lines INSERT → members whose alert radius covers the spot
 // Triggered by Database Webhooks (see README). Deploy:
 //   npx supabase functions deploy notify-nearby --no-verify-jwt
@@ -43,10 +43,27 @@ async function notifyNearby(table: Table, rec: Record<string, unknown>) {
   if (!spot || !spot.is_public) return 'no public spot';
 
   const creator = (table === 'events' ? rec.created_by : rec.user_id) as string | null;
-  const who = await displayName(creator);
+  // Check-ins respect who can see them: friends-only alerts go to friends; anonymous ones don't name anyone.
+  const visibility = table === 'sessions' ? String(rec.visibility ?? 'everyone') : 'everyone';
+  const who = visibility === 'anonymous' ? 'Someone' : await displayName(creator);
 
   const { data: members } = await supabase.rpc('members_near', { p_lat: spot.lat, p_lng: spot.lng, p_exclude: creator });
-  const tokens: string[] = (members ?? []).map((m: { push_token: string }) => m.push_token).filter(Boolean);
+  let nearby = (members ?? []) as { id: string; push_token: string }[];
+  if (visibility === 'friends') {
+    const { data: friends } = await supabase.rpc('friend_ids', { p_user: creator });
+    const ok = new Set(((friends ?? []) as { id: string }[]).map((f) => f.id));
+    nearby = nearby.filter((m) => ok.has(m.id));
+  }
+  // Never alert people the creator has blocked, or who blocked them.
+  if (creator && nearby.length) {
+    const { data: blocks } = await supabase
+      .from('blocks')
+      .select('blocker_id, blocked_id')
+      .or(`blocker_id.eq.${creator},blocked_id.eq.${creator}`);
+    const skip = new Set(((blocks ?? []) as { blocker_id: string; blocked_id: string }[]).map((b) => (b.blocker_id === creator ? b.blocked_id : b.blocker_id)));
+    nearby = nearby.filter((m) => !skip.has(m.id));
+  }
+  const tokens: string[] = nearby.map((m) => m.push_token).filter(Boolean);
   if (tokens.length === 0) return 'nobody nearby';
 
   let title: string;
@@ -59,7 +76,7 @@ async function notifyNearby(table: Table, rec: Record<string, unknown>) {
     title = `The line is up at ${spot.name}`;
     body = `${who} rigged a ${kind.toLowerCase()}${rec.length_ft ? ` (${rec.length_ft} ft)` : ''}. Pull up!`;
   } else {
-    title = `${who} is out here`;
+    title = visibility === 'anonymous' ? 'Someone is out here' : `${who} is out here`;
     body = `At ${spot.name}${rec.activity ? ` · ${rec.activity}` : ''}. Pull up!`;
   }
 

@@ -1,7 +1,7 @@
 {
   "appName": "Out Here Now",
   "contactEmail": "support@outherenow.app",
-  "updated": "October 2, 2026",
+  "updated": "November 20, 2026",
   "docs": {
     "terms": {
       "title": "Terms of Use",
@@ -103,6 +103,7 @@
             "Account: your email address, used to send sign-in codes.",
             "Profile: the name, photo, bio, activities and interests you choose to add.",
             "Things you post: spots, camps (including camp photos), reviews, \"I'm out here now\" check-ins, line posts, camp memberships, reports and blocks.",
+            "Friends: who you send friend requests to and who you are friends with, and your choice of who can see your check-ins and \"I'm going\".",
             "Approximate location: if you allow it, the app uses your location to center the map. For nearby alerts we save only your rough area, rounded to about 1 km. We never store your exact location.",
             "Notifications: if you turn on alerts, we save a push token for your device so we can send them.",
             "Support messages you send us from the app."
@@ -112,7 +113,7 @@
           "heading": "How we use it",
           "body": [
             "To run the app: show spots, camps and who's out now, send sign-in codes and nearby alerts, keep members safe, review reports, and respond to support messages.",
-            "Your name, photo, bio, activities, interests and the things you post are visible to other signed-in members. Your email, rough area and push token are never shown to other members."
+            "Your name, photo, bio, activities, interests and the things you post are visible to other signed-in members. Your email, rough area and push token are never shown to other members. Check-ins and \"I'm going\" follow the visibility you choose: Everyone (members see your name), Friends (only your friends see it) or Anonymous (members see that someone is there, not who). Your friends list is only visible to you."
           ]
         },
         {
@@ -164,6 +165,13 @@
           "heading": "Signing in",
           "body": [
             "Enter your email and we'll send you a code. Check your spam folder if it doesn't arrive within a minute. Codes expire after a short time, so request a new one if needed."
+          ]
+        },
+        {
+          "heading": "Friends and privacy",
+          "body": [
+            "Add friends from someone's profile or from Me → Friends. They have to accept, and either of you can remove the friendship at any time. Blocking someone also removes them as a friend.",
+            "Choose who sees your check-ins and \"I'm going\" on the Me tab: Everyone, Friends only, or Anonymous. You can also change it each time you check in."
           ]
         },
         {

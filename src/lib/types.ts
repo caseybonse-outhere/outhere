@@ -58,6 +58,8 @@ export type Profile = {
   disciplines: string[];
   /** "Juggling: Clubs" style tags, see DISCIPLINE_DETAILS. */
   discipline_details: string[];
+  /** Default for new check-ins and RSVPs. Only readable by the member themself. */
+  checkin_visibility: Visibility;
   bio: string | null;
   interests: string[];
   avatar_url: string | null;
@@ -116,9 +118,19 @@ export type JamEvent = {
   jam_members?: { count: number }[];
 };
 
+/** Who can see a check-in or an "I'm going". */
+export type Visibility = 'everyone' | 'friends' | 'anonymous';
+export const VISIBILITY_OPTIONS: { label: string; value: Visibility; help: string }[] = [
+  { label: 'Everyone', value: 'everyone', help: 'Any member sees your name.' },
+  { label: 'Friends', value: 'friends', help: 'Only your friends see you. Nobody else sees it at all.' },
+  { label: 'Anonymous', value: 'anonymous', help: 'Others see “someone” is there, not who.' },
+];
+
 export type Session = {
   id: string;
-  user_id: string;
+  /** null when the check-in is anonymous and not yours. */
+  user_id: string | null;
+  visibility: Visibility;
   spot_id: string;
   activity: string | null;
   /** "Juggling: Clubs" style tags for the activity, see DISCIPLINE_DETAILS. */
@@ -169,7 +181,9 @@ export type Line = {
 /** "I'm going" for one camp session (occurs_on = local date the session starts). */
 export type Rsvp = {
   event_id: string;
-  user_id: string;
+  /** null when the RSVP is anonymous and not yours. */
+  user_id: string | null;
+  visibility: Visibility;
   occurs_on: string;
   profile?: Pick<Profile, 'display_name' | 'avatar_url'>;
 };
@@ -199,4 +213,11 @@ export type OpenReport = {
   owner_name: string | null;
   owner_banned: boolean | null;
   preview: string;
+};
+
+export type Friendship = {
+  requester: string;
+  addressee: string;
+  status: 'pending' | 'accepted';
+  created_at: string;
 };
